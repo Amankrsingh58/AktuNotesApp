@@ -1,20 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "./ThemeProvider";
 import Icon from "./Icons";
 
-export default function Header() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+function SearchInput({ className }: { className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated, logout, setAuthModalOpen, setAuthModalView } = useAuth();
-
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +30,49 @@ export default function Header() {
       router.replace(`/?${params.toString()}`);
     }
   };
+
+  return (
+    <div className="relative w-full">
+      <Icon
+        name="Search"
+        size={16}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+      />
+      <input
+        type="text"
+        placeholder="Search articles..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className={className}
+      />
+    </div>
+  );
+}
+
+function SearchInputFallback({ className }: { className?: string }) {
+  return (
+    <div className="relative w-full">
+      <Icon
+        name="Search"
+        size={16}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+      />
+      <input
+        type="text"
+        placeholder="Search articles..."
+        disabled
+        className={className}
+      />
+    </div>
+  );
+}
+
+export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated, logout, setAuthModalOpen, setAuthModalView } = useAuth();
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -63,20 +102,13 @@ export default function Header() {
 
             {/* CENTER — Search (desktop) */}
             <div className="hidden md:flex flex-1 max-w-md mx-4">
-              <div className="relative w-full">
-                <Icon
-                  name="Search"
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Search articles..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full h-9 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
-                />
-              </div>
+              <Suspense
+                fallback={
+                  <SearchInputFallback className="w-full h-9 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+                }
+              >
+                <SearchInput className="w-full h-9 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+              </Suspense>
             </div>
 
             {/* RIGHT — Actions */}
@@ -149,18 +181,13 @@ export default function Header() {
         <div className="pt-20 px-6 pb-6 flex flex-col h-full">
           {/* Mobile search */}
           <div className="relative mb-6">
-            <Icon
-              name="Search"
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-            />
-            <input
-              type="text"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
-            />
+            <Suspense
+              fallback={
+                <SearchInputFallback className="w-full h-10 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+              }
+            >
+              <SearchInput className="w-full h-10 pl-9 pr-4 rounded-full bg-muted/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+            </Suspense>
           </div>
 
           {/* Mobile nav links */}
