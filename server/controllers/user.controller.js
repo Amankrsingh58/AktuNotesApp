@@ -5,6 +5,16 @@ const { OAuth2Client } = require("google-auth-library");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Robust production detection: Render auto-sets RENDER=true
+const isProduction = process.env.NODE_ENV === "production" || !!process.env.RENDER;
+
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, year, college } = req.body;
@@ -18,12 +28,7 @@ const registerUser = async (req, res) => {
 
         const token = jwt.sign({ id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: "7d" });
         
-        res.cookie("userToken", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+        res.cookie("userToken", token, getCookieOptions());
 
         res.status(201).json({ user: { id: user._id, name, email, year, college, following: user.following } });
     } catch (error) {
@@ -42,12 +47,7 @@ const loginUser = async (req, res) => {
 
         const token = jwt.sign({ id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: "7d" });
         
-        res.cookie("userToken", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("userToken", token, getCookieOptions());
 
         res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following } });
     } catch (error) {
@@ -56,11 +56,7 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-    res.clearCookie("userToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    });
+    res.clearCookie("userToken", getCookieOptions());
     res.json({ message: "Logged out successfully" });
 };
 
@@ -95,12 +91,7 @@ const googleLogin = async (req, res) => {
 
         const jwtToken = jwt.sign({ id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: "7d" });
         
-        res.cookie("userToken", jwtToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("userToken", jwtToken, getCookieOptions());
 
         res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following } });
     } catch (error) {

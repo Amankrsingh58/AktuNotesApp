@@ -10,6 +10,8 @@ const fs = require("fs");
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
+app.set('trust proxy', 1); // Trust Render's reverse proxy for secure cookies
+
 const allowedOrigins = [
   "https://aktu-notes-app-1t4n.vercel.app",
   "http://localhost:5173",
@@ -23,9 +25,9 @@ app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     const isAllowed = allowedOrigins.includes(origin) || 
-                      /^http:\/\/192\.168\.\d+\.\d+:5173$/.test(origin) || 
-                      /^http:\/\/10\.\d+\.\d+\.\d+:5173$/.test(origin) || 
-                      /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+:5173$/.test(origin);
+                      /^http:\/\/192\.168\.\d+\.\d+:(5173|3000)$/.test(origin) || 
+                      /^http:\/\/10\.\d+\.\d+\.\d+:(5173|3000)$/.test(origin) || 
+                      /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+:(5173|3000)$/.test(origin);
     if (isAllowed) {
       callback(null, true);
     } else {

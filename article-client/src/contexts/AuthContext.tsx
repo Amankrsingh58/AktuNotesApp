@@ -30,8 +30,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsLoading(true);
       const res = await api.get("/user/me");
-      if (res.data && res.data.success !== false) {
-        setUser(res.data);
+      if (res.data?.user) {
+        setUser(res.data.user);
         setIsAuthenticated(true);
       } else {
         setUser(null);
