@@ -193,12 +193,28 @@ export default function Header() {
           {/* Mobile nav links */}
           <nav className="flex flex-col gap-1 mb-6">
             <Link
-              href="/"
+              href="/?view=home"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
+            >
+              <Icon name="Home" size={20} />
+              Home
+            </Link>
+            <Link
+              href="/?view=profile"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
+            >
+              <Icon name="User" size={20} />
+              Profile
+            </Link>
+            <Link
+              href="/?view=articles"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
             >
               <Icon name="Layout" size={20} />
-              Articles
+              Your Stories
             </Link>
             {isAuthenticated ? (
               <Link
