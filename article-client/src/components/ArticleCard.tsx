@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Article } from "@/lib/types";
 import Icon from "./Icons";
@@ -13,11 +13,14 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article, currentUserId }: ArticleCardProps) {
-  const [bookmarked, setBookmarked] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
+
+  useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("bookmarked_articles") || "[]");
-    return saved.includes(article.slug);
-  });
+    if (saved.includes(article.slug)) {
+      setBookmarked(true);
+    }
+  }, [article.slug]);
 
   const toggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
