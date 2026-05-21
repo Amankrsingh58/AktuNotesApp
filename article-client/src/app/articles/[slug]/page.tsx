@@ -178,6 +178,43 @@ export default async function Page({ params }: PageProps) {
                     </div>
                   </div>
                 </div>
+
+                {/* Dynamic Top Socials */}
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  {article.author?.articleProfile?.socialLinks?.linkedin && (
+                    <a
+                      href={article.author.articleProfile.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground transition-colors"
+                      title="LinkedIn"
+                    >
+                      <Icon name="Linkedin" size={18} />
+                    </a>
+                  )}
+                  {article.author?.articleProfile?.socialLinks?.twitter && (
+                    <a
+                      href={`https://twitter.com/${article.author.articleProfile.socialLinks.twitter.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground transition-colors"
+                      title="Twitter"
+                    >
+                      <Icon name="Twitter" size={18} />
+                    </a>
+                  )}
+                  {article.author?.articleProfile?.socialLinks?.website && (
+                    <a
+                      href={article.author.articleProfile.socialLinks.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground transition-colors"
+                      title="Website"
+                    >
+                      <Icon name="Globe" size={18} />
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Interaction Bar Top */}
@@ -232,12 +269,47 @@ export default async function Page({ params }: PageProps) {
                     {article.author?.articleProfile?.bio ||
                       "An engineering student sharing insights on AKTU exams and student life."}
                   </p>
-                  <div className="flex items-center justify-center md:justify-start gap-4">
+                  <div className="flex items-center justify-center md:justify-start gap-6 mt-4 flex-wrap">
                     <AuthorFollow
                       authorId={article.author?._id}
                       authorName={article.author?.name}
                       variant="button"
                     />
+                    <div className="flex items-center gap-4 text-muted-foreground">
+                      {article.author?.articleProfile?.socialLinks?.website && (
+                        <a
+                          href={article.author.articleProfile.socialLinks.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-foreground transition-colors"
+                          title="Website"
+                        >
+                          <Icon name="Globe" size={18} />
+                        </a>
+                      )}
+                      {article.author?.articleProfile?.socialLinks?.twitter && (
+                        <a
+                          href={`https://twitter.com/${article.author.articleProfile.socialLinks.twitter.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-foreground transition-colors"
+                          title="Twitter"
+                        >
+                          <Icon name="Twitter" size={18} />
+                        </a>
+                      )}
+                      {article.author?.articleProfile?.socialLinks?.linkedin && (
+                        <a
+                          href={article.author.articleProfile.socialLinks.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-foreground transition-colors"
+                          title="LinkedIn"
+                        >
+                          <Icon name="Linkedin" size={18} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
