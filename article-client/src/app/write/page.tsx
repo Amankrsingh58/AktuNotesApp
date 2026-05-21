@@ -13,6 +13,8 @@ function WritePageContent() {
   const searchParams = useSearchParams();
   const editSlug = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const summaryRef = useRef<HTMLTextAreaElement>(null);
 
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -34,6 +36,21 @@ function WritePageContent() {
   const [isPreview, setIsPreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Auto-resize textareas when values change (essential for edit mode and mounting)
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.style.height = "auto";
+      titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
+    }
+  }, [title]);
+
+  useEffect(() => {
+    if (summaryRef.current) {
+      summaryRef.current.style.height = "auto";
+      summaryRef.current.style.height = `${summaryRef.current.scrollHeight}px`;
+    }
+  }, [summary]);
 
   if (isLoading || !isAuthenticated) {
     return (
@@ -236,27 +253,23 @@ function WritePageContent() {
       </div>
 
       <textarea
+        ref={titleRef}
         placeholder="Title..."
-        className="w-full text-4xl md:text-5xl font-bold bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/35 mb-4 h-auto text-foreground"
+        className="w-full text-4xl md:text-5xl font-bold bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/35 mb-4 text-foreground overflow-hidden"
         rows={1}
+        style={{ minHeight: "68px" }}
         value={title}
-        onChange={(e) => {
-          setTitle(e.target.value);
-          e.target.style.height = "inherit";
-          e.target.style.height = `${e.target.scrollHeight}px`;
-        }}
+        onChange={(e) => setTitle(e.target.value)}
       />
 
       <textarea
+        ref={summaryRef}
         placeholder="Short summary (for the feed)..."
-        className="w-full text-xl md:text-2xl font-light bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/35 mb-10 text-muted-foreground"
+        className="w-full text-xl md:text-2xl font-light bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/35 mb-10 text-muted-foreground overflow-hidden"
         rows={1}
+        style={{ minHeight: "44px" }}
         value={summary}
-        onChange={(e) => {
-          setSummary(e.target.value);
-          e.target.style.height = "inherit";
-          e.target.style.height = `${e.target.scrollHeight}px`;
-        }}
+        onChange={(e) => setSummary(e.target.value)}
       />
 
       <div className="space-y-4 mb-12 p-6 bg-muted/30 rounded-2xl border border-border">
