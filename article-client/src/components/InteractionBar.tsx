@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import Icon from "./Icons";
@@ -23,11 +23,14 @@ export default function InteractionBar({
   const [likes, setLikes] = useState<string[]>(initialLikes);
   const [loading, setLoading] = useState(false);
 
-  const [bookmarked, setBookmarked] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
+
+  useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("bookmarked_articles") || "[]");
-    return saved.includes(articleSlug);
-  });
+    if (saved.includes(articleSlug)) {
+      setBookmarked(true);
+    }
+  }, [articleSlug]);
 
   const handleLike = async () => {
     if (!isAuthenticated) {
