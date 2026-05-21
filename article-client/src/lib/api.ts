@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Article } from "./types";
+import { Article, Comment } from "./types";
 
 export const getApiBaseUrl = (): string => {
   if (typeof window === "undefined") {
@@ -63,4 +63,67 @@ export const getArticleBySlug = async (slug: string, cookieHeader?: string): Pro
     return null;
   }
 };
+
+// --- REST OF FEATURES FROM articleApi.js ---
+
+// checkProfileStatus: GET /articles/profile/status
+export const checkProfileStatus = async (): Promise<{ hasProfile: boolean; profile?: any }> => {
+  const res = await api.get("/articles/profile/status");
+  return res.data;
+};
+
+// updateProfile: POST /articles/profile
+export const updateProfile = async (profileData: any): Promise<any> => {
+  const res = await api.post("/articles/profile", profileData);
+  return res.data;
+};
+
+// createArticle: POST /articles
+export const createArticle = async (articleData: any): Promise<Article> => {
+  const res = await api.post("/articles", articleData);
+  return res.data;
+};
+
+// updateArticle: PUT /articles/:id
+export const updateArticle = async (id: string, articleData: any): Promise<Article> => {
+  const res = await api.put(`/articles/${id}`, articleData);
+  return res.data;
+};
+
+// getUserArticles: GET /articles/user/articles
+export const getUserArticles = async (): Promise<Article[]> => {
+  const res = await api.get("/articles/user/articles");
+  return res.data;
+};
+
+// likeArticle: POST /articles/:id/like
+export const likeArticle = async (id: string): Promise<{ isLiked: boolean; likes: string[] }> => {
+  const res = await api.post(`/articles/${id}/like`);
+  return res.data;
+};
+
+// addComment: POST /articles/:id/comments
+export const addComment = async (id: string, text: string): Promise<Comment> => {
+  const res = await api.post(`/articles/${id}/comments`, { text });
+  return res.data;
+};
+
+// deleteComment: DELETE /articles/:articleId/comments/:commentId
+export const deleteComment = async (articleId: string, commentId: string): Promise<any> => {
+  const res = await api.delete(`/articles/${articleId}/comments/${commentId}`);
+  return res.data;
+};
+
+// followUser: POST /articles/follow/:userId
+export const followUser = async (userId: string): Promise<{ isFollowing: boolean; following: string[]; message: string }> => {
+  const res = await api.post(`/articles/follow/${userId}`);
+  return res.data;
+};
+
+// deleteArticle: DELETE /articles/:id
+export const deleteArticle = async (id: string): Promise<any> => {
+  const res = await api.delete(`/articles/${id}`);
+  return res.data;
+};
+
 
