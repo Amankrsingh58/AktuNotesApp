@@ -30,7 +30,7 @@ const registerUser = async (req, res) => {
         
         res.cookie("userToken", token, getCookieOptions());
 
-        res.status(201).json({ user: { id: user._id, name, email, year, college, following: user.following } });
+        res.status(201).json({ user: { _id: user._id, id: user._id, name, email, year, college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -49,7 +49,7 @@ const loginUser = async (req, res) => {
         
         res.cookie("userToken", token, getCookieOptions());
 
-        res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -68,7 +68,7 @@ const getMe = async (req, res) => {
         const user = await User.findById(req.user.id).select("-password");
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following }, isAuthenticated: true });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following }, isAuthenticated: true });
     } catch (error) {
         res.json({ user: null, isAuthenticated: false });
     }
@@ -93,7 +93,7 @@ const googleLogin = async (req, res) => {
         
         res.cookie("userToken", jwtToken, getCookieOptions());
 
-        res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: "Google login failed" });
     }
@@ -110,7 +110,7 @@ const updateProfile = async (req, res) => {
         if (college) user.college = college;
 
         await user.save();
-        res.json({ user: { id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

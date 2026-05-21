@@ -151,7 +151,7 @@ exports.updateArticleProfile = async (req, res) => {
         };
 
         await user.save();
-        res.status(200).json({ message: "Article profile updated successfully", user });
+        res.status(200).json({ message: "Article profile updated successfully", user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: "Error updating profile", error: error.message });
     }
