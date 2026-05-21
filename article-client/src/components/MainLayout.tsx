@@ -84,7 +84,9 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
       });
       
       // Update local auth context
-      login(updatedUser);
+      if (updatedUser && updatedUser.user) {
+        login(updatedUser.user);
+      }
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update profile");
@@ -312,11 +314,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                                 </span>
                               </div>
                               <h3 className="text-xl font-bold text-foreground hover:text-primary transition-colors cursor-pointer" onClick={() => {
-                                if (art.status === "published") {
-                                  router.push(`/articles/${art.slug}`);
-                                } else {
-                                  router.push(`/write?edit=${art.slug}`);
-                                }
+                                router.push(`/write?edit=${art.slug}`);
                               }}>
                                 {art.title || "Untitled"}
                               </h3>

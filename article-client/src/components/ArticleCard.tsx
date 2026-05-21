@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Article } from "@/lib/types";
 import Icon from "./Icons";
 import toast from "react-hot-toast";
+import { deleteArticle } from "@/lib/api";
 
 interface ArticleCardProps {
   article: Article;
@@ -109,6 +110,35 @@ export default function ArticleCard({ article, currentUserId }: ArticleCardProps
             </div>
 
             <div className="flex items-center gap-3">
+              {currentUserId && currentUserId === article.author?._id && (
+                <div className="flex items-center gap-2 mr-2">
+                  <Link
+                    href={`/write?edit=${article.slug}`}
+                    className="px-3 py-1 border border-border text-foreground hover:bg-muted rounded-full text-xs font-semibold transition"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (window.confirm("Are you sure you want to permanently delete this story?")) {
+                        try {
+                          await deleteArticle(article._id);
+                          toast.success("Story deleted");
+                          window.location.reload(); // Refresh the page to show latest feed
+                        } catch (err) {
+                          toast.error("Failed to delete story");
+                        }
+                      }
+                    }}
+                    className="px-3 py-1 bg-red-600/10 text-red-600 hover:bg-red-600 hover:text-white rounded-full text-xs font-semibold transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={toggleBookmark}
                 className={`transition-colors ${
