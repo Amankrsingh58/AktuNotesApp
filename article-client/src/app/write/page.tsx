@@ -14,6 +14,16 @@ function WritePageContent() {
   const editSlug = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to login if unauthenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast.error("Please login to access the editor");
+      router.replace("/login?from=/write");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   const [articleId, setArticleId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -24,6 +34,14 @@ function WritePageContent() {
   const [isPreview, setIsPreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
+      </div>
+    );
+  }
 
   // Fetch article if we are in edit mode
   useEffect(() => {
