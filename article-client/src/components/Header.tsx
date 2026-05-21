@@ -194,6 +194,7 @@ export default function Header() {
           <nav className="flex flex-col gap-1 mb-6">
             <Link
               href="/"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
             >
               <Icon name="Layout" size={20} />
@@ -202,6 +203,7 @@ export default function Header() {
             {isAuthenticated ? (
               <Link
                 href="/write"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all no-underline"
               >
                 <Icon name="Edit3" size={20} />
@@ -220,13 +222,6 @@ export default function Header() {
                 Write
               </button>
             )}
-            <a
-              href="http://localhost:5173" // Redirect back to Vite React Notes app
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted font-medium transition-all"
-            >
-              <Icon name="Home" size={20} />
-              Back to Home
-            </a>
           </nav>
 
           {/* Mobile bottom actions */}
