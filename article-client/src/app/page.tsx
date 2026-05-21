@@ -5,7 +5,7 @@ import AuthModal from "@/components/AuthModal";
 import JsonLd from "@/components/JsonLd";
 import MainLayout from "@/components/MainLayout";
 
-export const revalidate = 60; // Page caches with ISR for 60 seconds
+export const dynamic = "force-dynamic"; // Disable page caching to reflect publishes and deletes instantly
 
 export default async function Page() {
   const articles = await getArticles();

@@ -31,7 +31,7 @@ api.interceptors.request.use((config) => {
 export const getArticles = async (): Promise<Article[]> => {
   try {
     const res = await fetch(`${getApiBaseUrl()}/articles`, {
-      next: { revalidate: 60 }, // ISR with 60 seconds revalidation
+      cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch articles");
     return await res.json();
@@ -51,7 +51,7 @@ export const getArticleBySlug = async (slug: string, cookieHeader?: string): Pro
 
     const res = await fetch(`${getApiBaseUrl()}/articles/${slug}`, {
       headers,
-      next: { revalidate: 10 }, // Quick ISR refresh
+      cache: "no-store",
     });
     if (!res.ok) {
       if (res.status === 404) return null;
