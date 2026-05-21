@@ -1,18 +1,36 @@
 import axios from "axios";
 import { Article } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api";
+export const getApiBaseUrl = (): string => {
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api";
+  }
+  const hostname = window.location.hostname;
+  const isLocal = hostname === "localhost" || 
+                  hostname === "127.0.0.1" || 
+                  hostname.startsWith("192.168.") || 
+                  hostname.startsWith("10.") || 
+                  hostname.startsWith("172.");
+  
+  return isLocal 
+    ? `http://${hostname}:5000/api` 
+    : "https://aktunotesapp.onrender.com/api";
+};
 
 // Create client axios instance for client-side fetches (with credentials for cookies)
 export const api = axios.create({
-  baseURL: API_BASE_URL,
   withCredentials: true,
+});
+
+api.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
+  return config;
 });
 
 // SSR / Server Component calls (running on the Node server during SSR/SSG/ISR)
 export const getArticles = async (): Promise<Article[]> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/articles`, {
+    const res = await fetch(`${getApiBaseUrl()}/articles`, {
       next: { revalidate: 60 }, // ISR with 60 seconds revalidation
     });
     if (!res.ok) throw new Error("Failed to fetch articles");
@@ -31,7 +49,7 @@ export const getArticleBySlug = async (slug: string, cookieHeader?: string): Pro
       headers["Cookie"] = cookieHeader;
     }
 
-    const res = await fetch(`${API_BASE_URL}/articles/${slug}`, {
+    const res = await fetch(`${getApiBaseUrl()}/articles/${slug}`, {
       headers,
       next: { revalidate: 10 }, // Quick ISR refresh
     });
@@ -45,3 +63,4 @@ export const getArticleBySlug = async (slug: string, cookieHeader?: string): Pro
     return null;
   }
 };
+
