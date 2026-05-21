@@ -119,10 +119,9 @@ export default function CommentSection({
                 comment.user?.name || "User"
               )}&background=random`;
 
-            const commentDate = new Date(comment.createdAt).toLocaleDateString(
-              "en-US",
-              { month: "short", day: "numeric" }
-            );
+            const commentDateObj = new Date(comment.createdAt);
+            const commentMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const commentDate = `${commentMonths[commentDateObj.getUTCMonth()]} ${commentDateObj.getUTCDate()}`;
 
             // Can delete if logged in user is either author of the article or comment writer
             const canDelete =

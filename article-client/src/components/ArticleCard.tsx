@@ -47,10 +47,9 @@ export default function ArticleCard({ article, currentUserId }: ArticleCardProps
       article.author?.name || "Author"
     )}&background=random`;
 
-  const formattedDate = new Date(article.createdAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+  const dateObj = new Date(article.createdAt);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const formattedDate = `${months[dateObj.getUTCMonth()]} ${dateObj.getUTCDate()}`;
 
   const likedByMe = currentUserId ? article.likes?.includes(currentUserId) : false;
 
