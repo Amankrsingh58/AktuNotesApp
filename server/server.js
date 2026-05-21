@@ -11,6 +11,7 @@ dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
 const allowedOrigins = [
+  "https://aktu-notes-app-1t4n.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://localhost:3000",
