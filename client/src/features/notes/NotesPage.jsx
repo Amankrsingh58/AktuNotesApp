@@ -1,0 +1,248 @@
+import React, { useState, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { useCreateNotesMutation, useDeleteNotesMutation, useGetDashboardNotesQuery, useUpdateNotesMutation } from "./notesApi";
+import NotesForm from "./NotesForm";
+import EditNotesModal from "./EditNotesModal";
+import { toast } from "react-hot-toast";
+
+export default function NotesPage() {
+  const { data: notes = [], isLoading } = useGetDashboardNotesQuery();
+  const {isAuthenticated, role} = useSelector((state) => state.auth);
+
+  const [createNotes, { isLoading: isCreating }] = useCreateNotesMutation();
+  const [deleteNotes] = useDeleteNotesMutation();
+  const [updateNotes, { isLoading: isUpdating }] = useUpdateNotesMutation();
+
+  const [editingNotes, setEditingNotes] = useState(null);
+
+  // FILTER STATE
+  const [filters, setFilters] = useState({
+    year: "",
+    unit: "",
+    subject: "",
+    date: "",
+    createdBy:""
+  });
+
+  const handleCreate = async (e, form) => {
+    e.preventDefault();
+    try {
+      await createNotes(form).unwrap();
+      toast.success("Notes created successfully");
+      e.target.reset();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to create notes");
+    }
+  };
+
+  const handleUpdate = async (e, form) => {
+    e.preventDefault();
+    try {
+      await updateNotes({
+        id: editingNotes._id,
+        data: form,
+      }).unwrap();
+      toast.success("Notes updated successfully");
+      setEditingNotes(null);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update notes");
+    }
+  };
+
+  //FILTER LOGIC (RUNS ONLY WHEN FILTERS CHANGE)
+  const filteredNotes = useMemo(() => {
+    return notes
+      .filter((item) => {
+        if (!item.isActive) return false;
+
+        if (filters.year && String(item.year) !== filters.year) return false;
+        if (
+          filters.unit &&
+          item.Unit !== filters.unit
+        )
+          return false;
+        if (
+          filters.subject &&
+          !item.subject.toLowerCase().includes(filters.subject.toLowerCase())
+        )
+          return false;
+        if (filters.date) {
+          const itemDate = new Date(item.createdAt).toISOString().split("T")[0];
+          if (itemDate !== filters.date) return false;
+        }
+        if (filters.createdBy) {
+          if (item.createdBy?.role !== filters.createdBy) return false;
+        }
+
+        return true;
+      })
+  }, [notes, filters]);
+
+  if (isLoading) {
+    return <div className="text-muted-foreground">Loading Notes...</div>;
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Heading */}
+      <div>
+        <h1 className="text-2xl text-foreground font-semibold">NOTES Management</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage Year wise Notes
+        </p>
+      </div>
+
+      {/* Create */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-medium mb-4">Add New NOTES</h2>
+        <NotesForm onSubmit={handleCreate} submitLabel="Create NOTES" isLoading={isCreating} />
+      </div>
+
+      {/* Table */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        {/* Header + Filters */}
+        <div className="px-6 py-4 border-b border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-lg font-medium">All Notes</h2>
+
+            <div className="grid grid-cols-1 cursor-pointer sm:grid-cols-3 gap-3 w-full sm:max-w-3xl">
+              {/* Year */}
+              <select
+                value={filters.year}
+                onChange={(e) =>
+                  setFilters({ ...filters, year: e.target.value })
+                }
+                className="px-3 bg-card cursor-pointer py-2  border border-border rounded-lg text-sm"
+              >
+                <option className="cursor-pointer" value="">All Years</option>
+                <option className="cursor-pointer" value="1">1st Year</option>
+                <option className="cursor-pointer" value="2">2nd Year</option>
+                <option className="cursor-pointer" value="3">3rd Year</option>
+                <option className="cursor-pointer" value="4">4th Year</option>
+              </select>
+
+              {/* Unit Year */}
+              <select
+                value={filters.unit}
+                onChange={(e) =>
+                  setFilters({ ...filters, unit: e.target.value })
+                }
+                className="px-3 bg-card cursor-pointer py-2  border border-border rounded-lg text-sm"
+              >
+                <option className="cursor-pointer" value="">All Units</option>
+                {[...new Set(notes.map((p) => p.Unit))].map((ay) => (
+                  <option className="cursor-pointer bg-card" key={ay} value={ay}>
+                    {ay}
+                  </option>
+                ))}
+              </select>
+
+              {/* Subject */}
+              <input
+                type="text"
+                placeholder="Search subject"
+                value={filters.subject}
+                onChange={(e) =>
+                  setFilters({ ...filters, subject: e.target.value })
+                }
+                className="px-3 py-2  border border-border rounded-lg text-sm"
+              />
+
+              {/* Date  */}
+              <input
+                type="date"
+                value={filters.date}
+                onChange={(e) =>
+                  setFilters({ ...filters, date: e.target.value })
+                }
+                className="px-3 py-2 bg-card   border border-border rounded-lg text-sm"
+              />
+
+              {/* Created By  */}
+              <select
+                value={filters.createdBy}
+                onChange={(e) =>
+                  setFilters({ ...filters, createdBy: e.target.value })
+                }
+                className="px-3 bg-card cursor-pointer py-2  border border-border rounded-lg text-sm"
+              >
+                <option className="cursor-pointer" value="">All Created By</option>
+                <option className="cursor-pointer" value="admin">Admin</option>
+              </select>
+
+              {/* Reset Filter  */}
+              <button
+                onClick={() =>
+                  setFilters({ year: "", unit: "", subject: "", date: "",createdBy:"" })
+                }
+                className="px-5 py-2.5 rounded-lg
+            bg-primary text-primary-foreground
+            hover:opacity-90
+            transition
+            cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        {filteredNotes.length === 0 ? (
+          <div className="p-6 text-muted-foreground">
+            No Notes found
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted">
+                <tr className="text-muted-foreground">
+                  <th className="px-6 py-3 text-left">Year</th>
+                  <th className="px-6 py-3 text-left">Sem</th>
+                  <th className="px-6 py-3 text-left">Subject</th>
+                  <th className="px-6 py-3 text-left">Unit</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-border">
+                {filteredNotes.map((notes) => (
+                  <tr key={notes._id} className="hover:bg-muted/50">
+                    <td className="px-6 py-4">{notes.year}</td>
+                    <td className="px-6 py-4">{notes.semester ?? "-"}</td>
+                    <td className="px-6 py-4">{notes.subject}</td>
+                    <td className="px-6 py-4">{notes.Unit}</td>
+                    <td className="px-6 py-4 text-right space-x-4">
+                      <button
+                        onClick={() => setEditingNotes(notes)}
+                        className="cursor-pointer text-primary hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteNotes(notes._id)}
+                        className="cursor-pointer text-destructive hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Edit Modal */}
+      {editingNotes && (
+        <EditNotesModal
+          notes={editingNotes}
+          onClose={() => setEditingNotes(null)}
+          onUpdate={handleUpdate}
+          isLoading={isUpdating}
+        />
+      )}
+    </div>
+  );
+}
