@@ -88,6 +88,40 @@ exports.optionalAuth = async (req, res, next) => {
   }
 };
 
+// Middleware to authenticate article users from HTTP-only cookie
+exports.articleUserAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies?.articleUserToken || req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "No token, authorization denied" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Attach user info (id, role) to request
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Session expired, please login again" });
+  }
+};
+
+// Middleware to optionally attach article user info if logged in (for public routes)
+exports.optionalArticleAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies?.articleUserToken || req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return next(); // Proceed without user info
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Attach user info if valid
+    next();
+  } catch (error) {
+    // If token is invalid/expired, still allow access but without user context
+    next();
+  }
+};
 
 // Example usage in a route
 // router.post("/some-protected-route", adminAuth, allowRoles("super_admin"), someControllerFunction);

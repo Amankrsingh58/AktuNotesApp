@@ -34,7 +34,7 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/user/login", formData);
+      const res = await api.post("/article-user/login", formData);
       login(res.data.user);
       toast.success("Login successful!");
       router.push(redirectPath);

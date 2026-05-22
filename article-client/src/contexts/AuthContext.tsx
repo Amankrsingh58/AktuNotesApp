@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/user/me");
+      const res = await api.get("/article-user/me");
       if (res.data?.user) {
         setUser(res.data.user);
         setIsAuthenticated(true);
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await api.post("/user/logout");
+      await api.post("/article-user/logout");
     } catch (error) {
       console.error("Logout request failed:", error);
     } finally {

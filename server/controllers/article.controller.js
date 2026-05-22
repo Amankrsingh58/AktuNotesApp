@@ -1,5 +1,5 @@
 const Article = require("../models/Article");
-const User = require("../models/User");
+const User = require("../models/ArticleUser");
 
 const slugify = (text) => {
     if (!text) return "";

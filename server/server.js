@@ -83,6 +83,10 @@ app.use("/api/payment", paymentRoutes);
 const articleRoutes = require("./routes/article.routes");
 app.use("/api/articles", articleRoutes);
 
+// Article User Auth routes
+const articleUserRoutes = require("./routes/articleUser.routes");
+app.use("/api/article-user", articleUserRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });

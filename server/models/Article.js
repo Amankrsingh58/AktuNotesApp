@@ -25,7 +25,7 @@ const ArticleSchema = new mongoose.Schema({
     },
     author: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "User",
+        ref: "ArticleUser",
         required: true 
     },
     tags: [{ 
@@ -33,10 +33,10 @@ const ArticleSchema = new mongoose.Schema({
     }],
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "ArticleUser"
     }],
     comments: [{
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "ArticleUser" },
         text: { type: String, required: true },
         createdAt: { type: Date, default: Date.now }
     }],

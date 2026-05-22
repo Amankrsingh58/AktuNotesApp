@@ -19,15 +19,14 @@ export default function AuthModal() {
     name: "",
     email: "",
     password: "",
-    year: "",
-    college: "",
+    bio: "",
   });
   const [loading, setLoading] = useState(false);
 
   if (!authModalOpen) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -37,14 +36,14 @@ export default function AuthModal() {
     setLoading(true);
     try {
       if (authModalView === "login") {
-        const res = await api.post("/user/login", {
+        const res = await api.post("/article-user/login", {
           email: formData.email,
           password: formData.password,
         });
         login(res.data.user);
         toast.success("Login successful!");
       } else {
-        const res = await api.post("/user/register", formData);
+        const res = await api.post("/article-user/register", formData);
         login(res.data.user);
         toast.success("Registration successful!");
       }
@@ -126,39 +125,18 @@ export default function AuthModal() {
           </div>
 
           {authModalView === "signup" && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-semibold text-foreground ml-1">
-                  Current Year
-                </label>
-                <select
-                  name="year"
-                  required
-                  value={formData.year}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-foreground ml-1">
-                  College
-                </label>
-                <input
-                  type="text"
-                  name="college"
-                  placeholder="College Name"
-                  required
-                  value={formData.college}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm"
-                />
-              </div>
+            <div>
+              <label className="text-xs font-semibold text-foreground ml-1">
+                Bio / Profession
+              </label>
+              <textarea
+                name="bio"
+                placeholder="Software Developer, Student, Writer..."
+                value={formData.bio}
+                onChange={handleChange}
+                rows={2}
+                className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm resize-none"
+              />
             </div>
           )}
 

@@ -15,13 +15,14 @@ export interface User {
   _id: string;
   name: string;
   email: string;
+  bio?: string;
   profilePic?: string;
   year?: number;
   college?: string;
   articleProfile?: ArticleProfile;
   followers?: string[];
   following?: string[];
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Comment {
