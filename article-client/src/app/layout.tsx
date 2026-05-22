@@ -25,16 +25,16 @@ export const metadata: Metadata = {
   description: "Read, write, and share academic and engineering articles with the AKTU student community. Exams preparation tips, subject strategies, and student stories.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   openGraph: {
-    title: "AKTU Notes Articles",
+    title: "cognora Articles",
     description: "Read & contribute engineering guides, resources, and exam strategies.",
     url: "/",
-    siteName: "AKTU Notes",
+    siteName: "cognora",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AKTU Notes Articles",
+    title: "cognora Articles",
     description: "Read & contribute engineering guides, resources, and exam strategies.",
   },
   robots: {

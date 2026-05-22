@@ -14,7 +14,7 @@ export default async function Page() {
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "AKTU Notes Articles",
+    "name": "Cognora Articles",
     "description": "Premium engineering, exam prep, preparation strategies, and B.Tech student notes and articles.",
     "url": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     "hasPart": articles.slice(0, 10).map((art) => ({

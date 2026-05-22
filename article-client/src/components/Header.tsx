@@ -40,7 +40,7 @@ function SearchInput({ className }: { className?: string }) {
       />
       <input
         type="text"
-        placeholder="Search articles..."
+        placeholder="Search Cognoras..."
         value={searchQuery}
         onChange={handleSearchChange}
         className={className}
@@ -96,7 +96,7 @@ export default function Header() {
                 <Icon name="Newspaper" size={18} className="text-primary" />
               </div>
               <span className="text-lg font-semibold text-foreground tracking-tight">
-                Articles
+                Cognoras
               </span>
             </Link>
 

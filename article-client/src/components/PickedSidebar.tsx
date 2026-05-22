@@ -52,7 +52,7 @@ export default function PickedSidebar({ articles }: PickedSidebarProps) {
         </div>
 
         <div className="p-6 bg-primary/10 rounded-xl border border-primary/20">
-          <h4 className="font-bold text-foreground mb-2">Writing on AKTU Notes</h4>
+          <h4 className="font-bold text-foreground mb-2">Writing on Cognora</h4>
           <p className="text-sm text-muted-foreground mb-4">
             Share your student journey or exam tips with everyone.
           </p>
