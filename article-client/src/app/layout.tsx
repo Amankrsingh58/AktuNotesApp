@@ -19,8 +19,8 @@ const sourceSerif = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "Articles — AKTU Notes",
-    template: "%s | AKTU Notes",
+    default: "Cognora",
+    template: "%s ",
   },
   description: "Read, write, and share academic and engineering articles with the AKTU student community. Exams preparation tips, subject strategies, and student stories.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
