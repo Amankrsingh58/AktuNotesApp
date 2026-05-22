@@ -241,7 +241,8 @@ body {
 .dark .prose span[style*="background-color: #fef08a"],
 .dark .prose span[style*="background-color: rgb(254, 240, 138)"] {
   background-color: rgb(245 158 11 / 0.35) !important;
-  color: rgb(15 23 42) !important;
+  /* color: rgb(15 23 42) !important; */
+  color: rgb(199, 207, 224) !important;
 }
 
 .prose code {
