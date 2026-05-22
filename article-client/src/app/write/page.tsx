@@ -18,14 +18,6 @@ function WritePageContent() {
 
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Redirect to login if unauthenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast.error("Please login to access the editor");
-      router.replace("/login?from=/write");
-    }
-  }, [isAuthenticated, isLoading, router]);
-
   const [articleId, setArticleId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -36,6 +28,14 @@ function WritePageContent() {
   const [isPreview, setIsPreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Redirect to login if unauthenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast.error("Please login to access the editor");
+      router.replace("/login?from=/write");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   // Auto-resize textareas when values change (essential for edit mode and mounting)
   useEffect(() => {
@@ -52,17 +52,9 @@ function WritePageContent() {
     }
   }, [summary]);
 
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
-      </div>
-    );
-  }
-
   // Fetch article if we are in edit mode
   useEffect(() => {
-    if (!editSlug) return;
+    if (!editSlug || !isAuthenticated) return;
 
     const fetchArticle = async () => {
       setLoading(true);
@@ -83,7 +75,15 @@ function WritePageContent() {
     };
 
     fetchArticle();
-  }, [editSlug]);
+  }, [editSlug, isAuthenticated]);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
