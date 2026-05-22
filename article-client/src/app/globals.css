@@ -226,6 +226,24 @@ body {
   opacity: 0.8;
 }
 
+.prose mark,
+.prose .highlight,
+.prose span[style*="background-color: #fef08a"],
+.prose span[style*="background-color: rgb(254, 240, 138)"] {
+  background-color: rgb(254 240 138 / 0.95) !important;
+  color: rgb(15 23 42) !important;
+  border-radius: 0.25rem;
+  padding: 0.05em 0.18em;
+}
+
+.dark .prose mark,
+.dark .prose .highlight,
+.dark .prose span[style*="background-color: #fef08a"],
+.dark .prose span[style*="background-color: rgb(254, 240, 138)"] {
+  background-color: rgb(245 158 11 / 0.35) !important;
+  color: rgb(15 23 42) !important;
+}
+
 .prose code {
   background: rgb(var(--color-muted));
   padding: 0.15em 0.4em;
