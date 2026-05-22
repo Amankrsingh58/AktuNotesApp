@@ -13,6 +13,7 @@ app.use(cookieParser());
 app.set('trust proxy', 1); // Trust Render's reverse proxy for secure cookies
 
 const allowedOrigins = [
+  "https://www.cognora.in",
   "https://aktu-notes-app-1t4n.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
