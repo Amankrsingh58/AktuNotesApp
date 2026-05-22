@@ -22,6 +22,15 @@ export default function AuthorFollow({
   });
   const [loading, setLoading] = useState(false);
 
+  // Sync follow state when user data loads asynchronously
+  React.useEffect(() => {
+    if (user) {
+      setFollowing(user.following?.includes(authorId) || false);
+    } else {
+      setFollowing(false);
+    }
+  }, [user, authorId]);
+
   const handleFollow = async () => {
     if (!isAuthenticated) {
       setAuthModalView("login");
