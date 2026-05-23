@@ -22,26 +22,37 @@ export const metadata: Metadata = {
     default: "Cognora",
     template: "%s ",
   },
-  description: "Read, write, and share academic and engineering articles with the AKTU student community. Exams preparation tips, subject strategies, and student stories.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  openGraph: {
-    title: "cognora Articles",
-    description: "Read & contribute engineering guides, resources, and exam strategies.",
-    url: "/",
-    siteName: "cognora",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "cognora Articles",
-    description: "Read & contribute engineering guides, resources, and exam strategies.",
+ description:
+  "Discover insightful AI, technology, software development, and engineering articles on Cognora. Read expert guides, coding tutorials, tech trends, productivity tips, and modern developer insights.",
+
+metadataBase: new URL(
+  process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in"
+),
+
+openGraph: {
+  title: "Cognora | AI, Tech & Software Engineering Articles",
+  description:
+    "Explore AI, software engineering, coding tutorials, developer resources, and modern technology insights on Cognora.",
+  url: "/",
+  siteName: "Cognora",
+  locale: "en_US",
+  type: "website",
+},
+
+twitter: {
+  card: "summary_large_image",
+  title: "Cognora | AI, Tech & Software Engineering Articles",
+  description:
+    "Read AI, software development, coding, and technology articles with modern insights, tutorials, and developer resources on Cognora.",
+},
   },
   robots: {
     index: true,
     follow: true,
   },
+
 };
+
 
 export default function RootLayout({
   children,
