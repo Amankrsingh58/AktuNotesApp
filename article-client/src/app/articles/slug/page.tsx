@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!article) {
     return {
-      title: "Article Not Found | AKTU Notes",
+      title: "Article Not Found",
       description: "The requested article could not be found.",
     };
   }

@@ -1,129 +1,122 @@
 import axios from "axios";
 import { Article, Comment } from "./types";
 
+// ✅ Always use env variable — no dynamic window logic needed
 export const getApiBaseUrl = (): string => {
-  if (typeof window === "undefined") {
-    return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api";
-  }
-  const hostname = window.location.hostname;
-  const isLocal = hostname === "localhost" || 
-                  hostname === "127.0.0.1" || 
-                  hostname.startsWith("192.168.") || 
-                  hostname.startsWith("10.") || 
-                  hostname.startsWith("172.");
-  
-  return isLocal 
-    ? `http://${hostname}:5000/api` 
-    : "https://aktunotesapp.onrender.com/api";
+  return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api";
 };
 
-// Create client axios instance for client-side fetches (with credentials for cookies)
+// ✅ Client-side axios instance
 export const api = axios.create({
+  baseURL: getApiBaseUrl(), // ✅ Set once, not on every request
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  config.baseURL = getApiBaseUrl();
-  return config;
-});
-
-// SSR / Server Component calls (running on the Node server during SSR/SSG/ISR)
+// ✅ SSR fetch — with revalidation instead of no-store
 export const getArticles = async (): Promise<Article[]> => {
   try {
     const res = await fetch(`${getApiBaseUrl()}/articles`, {
-      cache: "no-store",
+      next: { revalidate: 60 }, // ✅ Cache for 60s, not no-store
     });
     if (!res.ok) throw new Error("Failed to fetch articles");
-    return await res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : []; // ✅ Safety check
   } catch (error) {
-    console.error("Error in getArticles server-side fetch:", error);
+    console.error("Error in getArticles:", error);
     return [];
   }
 };
 
-export const getArticleBySlug = async (slug: string, cookieHeader?: string): Promise<Article | null> => {
+export const getArticleBySlug = async (
+  slug: string,
+  cookieHeader?: string
+): Promise<Article | null> => {
   try {
-    // If the server component runs and has cookies (optionalAuth), pass them along
     const headers: Record<string, string> = {};
-    if (cookieHeader) {
-      headers["Cookie"] = cookieHeader;
-    }
+    if (cookieHeader) headers["Cookie"] = cookieHeader;
 
     const res = await fetch(`${getApiBaseUrl()}/articles/${slug}`, {
       headers,
-      cache: "no-store",
+      next: { revalidate: 60 }, // ✅ Cache individual articles too
     });
+
     if (!res.ok) {
       if (res.status === 404) return null;
       throw new Error(`Failed to fetch article: ${res.statusText}`);
     }
     return await res.json();
   } catch (error) {
-    console.error(`Error in getArticleBySlug server-side fetch (${slug}):`, error);
+    console.error(`Error fetching article (${slug}):`, error);
     return null;
   }
 };
 
-// --- REST OF FEATURES FROM articleApi.js ---
-
-// checkProfileStatus: GET /articles/profile/status
-export const checkProfileStatus = async (): Promise<{ hasProfile: boolean; profile?: any }> => {
+export const checkProfileStatus = async (): Promise<{
+  hasProfile: boolean;
+  profile?: any;
+}> => {
   const res = await api.get("/articles/profile/status");
   return res.data;
 };
 
-// updateProfile: POST /articles/profile
 export const updateProfile = async (profileData: any): Promise<any> => {
   const res = await api.post("/articles/profile", profileData);
   return res.data;
 };
 
-// createArticle: POST /articles
 export const createArticle = async (articleData: any): Promise<Article> => {
   const res = await api.post("/articles", articleData);
   return res.data;
 };
 
-// updateArticle: PUT /articles/:id
-export const updateArticle = async (id: string, articleData: any): Promise<Article> => {
+export const updateArticle = async (
+  id: string,
+  articleData: any
+): Promise<Article> => {
   const res = await api.put(`/articles/${id}`, articleData);
   return res.data;
 };
 
-// getUserArticles: GET /articles/user/articles
 export const getUserArticles = async (): Promise<Article[]> => {
   const res = await api.get("/articles/user/articles");
-  return res.data;
+  return Array.isArray(res.data) ? res.data : []; // ✅ Safety check
 };
 
-// likeArticle: POST /articles/:id/like
-export const likeArticle = async (id: string): Promise<{ isLiked: boolean; likes: string[] }> => {
+export const likeArticle = async (
+  id: string
+): Promise<{ isLiked: boolean; likes: string[] }> => {
   const res = await api.post(`/articles/${id}/like`);
   return res.data;
 };
 
-// addComment: POST /articles/:id/comments
-export const addComment = async (id: string, text: string): Promise<Comment> => {
+export const addComment = async (
+  id: string,
+  text: string
+): Promise<Comment> => {
   const res = await api.post(`/articles/${id}/comments`, { text });
   return res.data;
 };
 
-// deleteComment: DELETE /articles/:articleId/comments/:commentId
-export const deleteComment = async (articleId: string, commentId: string): Promise<any> => {
+export const deleteComment = async (
+  articleId: string,
+  commentId: string
+): Promise<any> => {
   const res = await api.delete(`/articles/${articleId}/comments/${commentId}`);
   return res.data;
 };
 
-// followUser: POST /articles/follow/:userId
-export const followUser = async (userId: string): Promise<{ isFollowing: boolean; following: string[]; message: string }> => {
+export const followUser = async (
+  userId: string
+): Promise<{
+  isFollowing: boolean;
+  following: string[];
+  message: string;
+}> => {
   const res = await api.post(`/articles/follow/${userId}`);
   return res.data;
 };
 
-// deleteArticle: DELETE /articles/:id
 export const deleteArticle = async (id: string): Promise<any> => {
   const res = await api.delete(`/articles/${id}`);
   return res.data;
 };
-
-
