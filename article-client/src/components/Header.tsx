@@ -94,7 +94,7 @@ export default function Header() {
             <Link href="/" className="flex items-center gap-3 no-underline shrink-0">
               <div className="h-10 w-10 overflow-hidden rounded-lg border border-border/20 bg-muted">
                 <img
-                  src="/logo.jpeg"
+                  src="/mainlogo.jpeg"
                   alt="Cognoras logo"
                   className="h-full w-full object-cover"
                 />
