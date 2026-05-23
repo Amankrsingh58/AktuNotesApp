@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     template: "%s | Cognora",
   },
    icons: {
-    icon: '/mainlogo2.jpeg', 
-    apple: '/mainlogo2.jpeg',
+    icon: '/mainlogo2.png', 
+    apple: '/mainlogo2.png',
   },
   description:
     "Discover insightful AI, technology, software development, and engineering articles on Cognora. Read expert guides, coding tutorials, tech trends, productivity tips, and modern developer insights.",
