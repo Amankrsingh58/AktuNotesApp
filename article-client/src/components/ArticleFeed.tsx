@@ -5,13 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { Article } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
 import ArticleCard from "./ArticleCard";
+import ArticleSkeleton from "./ArticleSkeleton";
 import Icon from "./Icons";
 
 interface ArticleFeedProps {
   initialArticles: Article[];
+  isLoading?: boolean;
 }
 
-export default function ArticleFeed({ initialArticles }: ArticleFeedProps) {
+export default function ArticleFeed({ initialArticles, isLoading = false }: ArticleFeedProps) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
@@ -82,7 +84,11 @@ export default function ArticleFeed({ initialArticles }: ArticleFeedProps) {
 
       {/* Feed List */}
       <div className="space-y-12">
-        {filteredArticles.length === 0 ? (
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, index) => (
+            <ArticleSkeleton key={`skeleton-${index}`} />
+          ))
+        ) : filteredArticles.length === 0 ? (
           <div className="py-20 text-center">
             <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Icon name="Search" size={24} className="text-muted-foreground" />

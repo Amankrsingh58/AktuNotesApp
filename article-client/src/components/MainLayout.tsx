@@ -14,6 +14,7 @@ import Sidebar from "./Sidebar";
 import ArticleFeed from "./ArticleFeed";
 import PickedSidebar from "./PickedSidebar";
 import Icon from "./Icons";
+import CircleDotsPreloader from "./CircleDotsPreloader";
 import toast from "react-hot-toast";
 
 interface MainLayoutProps {
@@ -272,8 +273,8 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                   </div>
 
                   {loadingArticles ? (
-                    <div className="py-20 text-center">
-                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary mx-auto"></div>
+                    <div className="py-20 flex justify-center">
+                      <CircleDotsPreloader />
                     </div>
                   ) : userArticles.length === 0 ? (
                     <div className="text-center py-20 bg-card border border-border rounded-3xl p-8 shadow-xl">

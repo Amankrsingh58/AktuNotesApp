@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import AuthModal from "@/components/AuthModal";
 import JsonLd from "@/components/JsonLd";
 import MainLayout from "@/components/MainLayout";
+import CircleDotsPreloader from "@/components/CircleDotsPreloader";
 
 export const dynamic = "force-dynamic"; // Disable page caching to reflect publishes and deletes instantly
 
@@ -37,7 +38,7 @@ export default async function Page() {
         <Header />
         <Suspense fallback={
           <div className="min-h-[50vh] flex items-center justify-center bg-background">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
+            <CircleDotsPreloader />
           </div>
         }>
           <MainLayout initialArticles={articles} />
