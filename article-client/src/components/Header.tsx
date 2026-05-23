@@ -99,9 +99,11 @@ export default function Header() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span className="text-lg font-semibold text-foreground tracking-tight">
-                Cognoras
-              </span>
+              <img
+                src={theme === "dark" ? "/darklogo.png" : "/lightlogo.png"}
+                alt="Cognoras"
+                className="h-6 object-contain"
+              />
             </Link>
 
             {/* CENTER — Search (desktop) */}
