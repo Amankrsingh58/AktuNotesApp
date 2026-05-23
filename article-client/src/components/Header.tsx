@@ -100,7 +100,7 @@ export default function Header() {
                 />
               </div>
               <img
-                src={theme === "dark" ? "/darklogo.png" : "/lightlogo.png"}
+                src={theme === "dark" ? "/lightlogo.png" : "/darklogo.png"}
                 alt="Cognoras"
                 className="h-6 object-contain"
               />
