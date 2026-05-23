@@ -102,7 +102,7 @@ export default function Header() {
               <img
                 src={theme === "dark" ? "/lightlogo.png" : "/darklogo.png"}
                 alt="Cognoras"
-                className="h-8.5 object-contain"
+                className="h-[8.5rem] object-contain"
               />
             </Link>
 
