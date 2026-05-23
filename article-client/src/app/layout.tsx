@@ -17,10 +17,15 @@ const sourceSerif = Source_Serif_4({
   display: "swap",
 });
 
+
 export const metadata: Metadata = {
   title: {
     default: "Cognora",
     template: "%s | Cognora",
+  },
+   icons: {
+    icon: '/mainlogo.jpeg', 
+    apple: '/apple-icon.png',
   },
   description:
     "Discover insightful AI, technology, software development, and engineering articles on Cognora. Read expert guides, coding tutorials, tech trends, productivity tips, and modern developer insights.",
