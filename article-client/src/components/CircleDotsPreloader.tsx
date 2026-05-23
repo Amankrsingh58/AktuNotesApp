@@ -13,7 +13,7 @@ export default function CircleDotsPreloader() {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center min-h-screen">
       <svg
         width="120"
         height="120"
