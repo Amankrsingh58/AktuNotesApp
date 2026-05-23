@@ -65,7 +65,7 @@ const Header = () => {
 
   const navigationItems = [
     { path: "/home", label: "Home", icon: "Home" },
-    { path: "/articles", label: "Articles", icon: "Layout" },
+    { path: "https://cognona.in", label: "Articles", icon: "Layout" },
     { path: "/notes/years", label: "B.Tech Notes", icon: "BookOpen" },
     { path: "/pyq/semesters", label: "AKTU PYQs", icon: "FileText" },
     // { path: "/interview-questions", label: "Interview Notes", icon: "BookOpen" },

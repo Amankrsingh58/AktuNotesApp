@@ -91,9 +91,13 @@ export default function Header() {
         <div className="max-w-[1440px] mx-auto px-4">
           <div className="flex h-14 items-center justify-between gap-4">
             {/* LEFT — Logo + Brand */}
-            <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Icon name="Newspaper" size={18} className="text-primary" />
+            <Link href="/" className="flex items-center gap-3 no-underline shrink-0">
+              <div className="h-10 w-10 overflow-hidden rounded-lg border border-border/20 bg-muted">
+                <img
+                  src="/logo.jpeg"
+                  alt="Cognoras logo"
+                  className="h-full w-full object-cover"
+                />
               </div>
               <span className="text-lg font-semibold text-foreground tracking-tight">
                 Cognoras
