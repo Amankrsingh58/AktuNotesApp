@@ -70,13 +70,13 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment/status/:merchantTransactionId" element={<PaymentStatus />} />
           
-          <Route element={<ArticleProtectedRoute />}>
+          {/* <Route element={<ArticleProtectedRoute />}>
             <Route element={<ArticleLayout />}>
               <Route path="/articles" element={<Articles />} />
               <Route path="/articles/:slug" element={<ArticleDetail />} />
               <Route path="/write" element={<WriteArticle />} />
             </Route>
-          </Route>
+          </Route> */}
           <Route path="/complete-article-profile" element={<CompleteProfile />} />
 
           <Route path="*" element={<NotFound />} />
