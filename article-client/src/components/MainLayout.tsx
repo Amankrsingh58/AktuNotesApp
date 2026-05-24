@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Article } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +11,7 @@ import {
 } from "@/lib/api";
 import Sidebar from "./Sidebar";
 import ArticleFeed from "./ArticleFeed";
+import ArticleFeedSkeleton from "./ArticleFeedSkeleton";
 import PickedSidebar from "./PickedSidebar";
 import Icon from "./Icons";
 import CircleDotsPreloader from "./CircleDotsPreloader";
@@ -24,6 +25,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeView = searchParams.get("view") || "home";
+  const [isPending, startTransition] = useTransition();
 
   const { user, isAuthenticated, login, setAuthModalOpen, setAuthModalView } =
     useAuth();
@@ -134,7 +136,13 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
           {/* HOME VIEW */}
           {activeView === "home" && (
             <div className="flex flex-col justify-center lg:flex-row gap-12">
-              <ArticleFeed initialArticles={initialArticles} />
+              {isPending ? (
+                <ArticleFeedSkeleton />
+              ) : (
+                <Suspense fallback={<ArticleFeedSkeleton />}>
+                  <ArticleFeed initialArticles={initialArticles} />
+                </Suspense>
+              )}
               <PickedSidebar articles={initialArticles} />
             </div>
           )}
