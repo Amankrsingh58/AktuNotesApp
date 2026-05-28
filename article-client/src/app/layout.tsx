@@ -20,36 +20,70 @@ const sourceSerif = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "Cognora",
+    default: "Cognora | Articles, Technologies, AI & Tech Insights",
     template: "%s | Cognora",
   },
-   icons: {
-    icon: '/mainlogo2.png', 
-    apple: '/mainlogo2.png',
-  },
   description:
-    "Discover insightful AI, technology, software development, and engineering articles on Cognora. Read expert guides, coding tutorials, tech trends, productivity tips, and modern developer insights.",
+    "Explore Cognora for the latest articles on AI, emerging technologies, software engineering, and tech trends. Dive into expert tutorials, coding guides, and modern developer insights.",
+  keywords: [
+    "articles", "technologies", "AI", "tech articles", "software engineering", 
+    "coding tutorials", "developer insights", "artificial intelligence", 
+    "tech trends", "programming", "software development", "Cognora"
+  ],
+  authors: [{ name: "Cognora Team" }],
+  creator: "Cognora",
+  publisher: "Cognora",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in"
   ),
+  icons: {
+    icon: "/mainlogo2.png",
+    apple: "/mainlogo2.png",
+  },
+  manifest: "/manifest.json",
   openGraph: {
-    title: "Cognora | AI, Tech & Software Engineering Articles",
+    title: "Cognora | Articles, Technologies, AI & Tech Insights",
     description:
-      "Explore AI, software engineering, coding tutorials, developer resources, and modern technology insights on Cognora.",
+      "Dive into the world of AI, software engineering, and modern technology with Cognora's expert-led articles and tutorials.",
     url: "/",
     siteName: "Cognora",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/mainlogo2.png",
+        width: 1200,
+        height: 630,
+        alt: "Cognora - AI & Tech Articles",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Cognora | AI, Tech & Software Engineering Articles",
     description:
-      "Read AI, software development, coding, and technology articles with modern insights, tutorials, and developer resources on Cognora.",
+      "Read the latest AI, software development, and technology articles with modern insights and tutorials on Cognora.",
+    images: ["/mainlogo2.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
+  category: "technology",
+  verification: {
+    google: "OxoLwKSyxs_o64stusfp8NZ-QDixLLoYXRWlMSdz3WE",
   },
 };
 

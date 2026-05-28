@@ -87,7 +87,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border/50 transition-all duration-200">
+      <header className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border/50 transition-all duration-200" role="banner">
         <div className="max-w-[1440px] mx-auto px-4">
           <div className="flex h-14 items-center justify-between gap-4">
             {/* LEFT — Logo + Brand */}

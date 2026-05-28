@@ -10,9 +10,12 @@ import { deleteArticle } from "@/lib/api";
 interface ArticleCardProps {
   article: Article;
   currentUserId?: string;
+  index?: number;
 }
 
-export default function ArticleCard({ article, currentUserId }: ArticleCardProps) {
+export default function ArticleCard({ article, currentUserId, index = 0 }: ArticleCardProps) {
+  const isPriority = index < 2;
+  const loadingType = isPriority ? "eager" : "lazy";
   const [bookmarked, setBookmarked] = useState<boolean>(false);
 
   useEffect(() => {
@@ -63,12 +66,14 @@ export default function ArticleCard({ article, currentUserId }: ArticleCardProps
               src={authorPic}
               alt={article.author?.name || "Author"}
               className="w-5 h-5 rounded-full object-cover"
+              loading={loadingType}
+              decoding="async"
             />
             <span className="text-[13px] font-medium text-foreground">
               {article.author?.name}
             </span>
             <span className="text-[13px] text-muted-foreground">·</span>
-            <span className="text-[13px] text-muted-foreground">{formattedDate}</span>
+            <time dateTime={article.createdAt} className="text-[13px] text-muted-foreground">{formattedDate}</time>
           </div>
 
           {/* Title Link */}
@@ -165,6 +170,8 @@ export default function ArticleCard({ article, currentUserId }: ArticleCardProps
               src={article.coverImage}
               alt={article.title}
               className="w-full h-full object-cover rounded shadow-sm opacity-90 dark:opacity-80 group-hover:opacity-100 transition-opacity"
+              loading={loadingType}
+              decoding="async"
             />
           </div>
         )}

@@ -36,6 +36,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: article.seoTitle || article.title,
     description: article.seoDescription || article.summary,
+    keywords: [
+      ...(article.tags || []),
+      "Cognora",
+      "Tech Articles",
+      "Software Engineering",
+      "AI Insights",
+    ],
     alternates: {
       canonical: `${siteUrl}/articles/${article.slug}`,
     },
@@ -90,7 +97,7 @@ export default async function Page({ params }: PageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   // Create Article Schema Markup for Google Rich Results
-  const schemaData = {
+  const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     "headline": article.title,
@@ -105,16 +112,41 @@ export default async function Page({ params }: PageProps) {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "AKTU Notes",
+      "name": "Cognora",
       "logo": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/logo.png`,
+        "url": `${siteUrl}/mainlogo2.png`,
       },
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `${siteUrl}/articles/${article.slug}`,
     },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Articles",
+        "item": `${siteUrl}/`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": article.title,
+        "item": `${siteUrl}/articles/${article.slug}`,
+      },
+    ],
   };
 
   const authorPic =
@@ -131,7 +163,8 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <>
-      <JsonLd data={schemaData} />
+      <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbSchema} />
       <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
         <AuthModal />
         <Header />
@@ -142,6 +175,15 @@ export default async function Page({ params }: PageProps) {
             <AuthorBanner article={article} />
 
             <article className="pt-16 pb-20 max-w-[720px] mx-auto px-5 md:px-0">
+              {/* Visible Breadcrumb Navigation */}
+              <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+                <span>/</span>
+                <Link href="/" className="hover:text-foreground transition-colors">Articles</Link>
+                <span>/</span>
+                <span className="text-foreground truncate max-w-[200px]" title={article.title}>{article.title}</span>
+              </nav>
+
               {/* Title */}
               <h1 className="text-[32px] md:text-[42px] font-bold text-foreground mb-6 leading-[1.2] tracking-tight">
                 {article.title}
@@ -174,7 +216,7 @@ export default async function Page({ params }: PageProps) {
                     <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
                       <span>{article.readTime || 1} min read</span>
                       <span>·</span>
-                      <span>{formattedDate}</span>
+                      <time dateTime={article.createdAt}>{formattedDate}</time>
                     </div>
                   </div>
                 </div>
@@ -346,7 +388,8 @@ export default async function Page({ params }: PageProps) {
                                 <img
                                   src={art.coverImage || "/default-cover.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  alt=""
+                                  alt={art.title}
+                                  loading="lazy"
                                 />
                               </div>
                             </Link>
@@ -354,7 +397,8 @@ export default async function Page({ params }: PageProps) {
                               <img
                                 src={recAuthorPic}
                                 className="w-5 h-5 rounded-full object-cover"
-                                alt=""
+                                alt={art.author?.name || "Author"}
+                                loading="lazy"
                               />
                               <span className="text-[13px] font-medium text-foreground">
                                 {art.author?.name}
@@ -396,7 +440,8 @@ export default async function Page({ params }: PageProps) {
                                 <img
                                   src={art.coverImage || "/default-cover.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  alt=""
+                                  alt={art.title}
+                                  loading="lazy"
                                 />
                               </div>
                             </Link>
@@ -404,7 +449,8 @@ export default async function Page({ params }: PageProps) {
                               <img
                                 src={recAuthorPic}
                                 className="w-5 h-5 rounded-full object-cover"
-                                alt=""
+                                alt={art.author?.name || "Author"}
+                                loading="lazy"
                               />
                               <span className="text-[13px] font-medium text-foreground">
                                 {art.author?.name}

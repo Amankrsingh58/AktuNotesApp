@@ -16,7 +16,7 @@ export default function PickedSidebar({ articles }: PickedSidebarProps) {
   const picks = articles.slice(0, 3);
 
   return (
-    <aside className="hidden lg:block lg:w-[360px] border-l border-border pl-12 h-fit sticky top-24">
+    <aside aria-label="Recommended articles" className="hidden lg:block lg:w-[360px] border-l border-border pl-12 h-fit sticky top-24">
       <div className="space-y-10">
         <div>
           <h3 className="text-sm font-bold text-foreground mb-4">Staff Picks</h3>
@@ -34,7 +34,8 @@ export default function PickedSidebar({ articles }: PickedSidebarProps) {
                     <img
                       src={authorPic}
                       className="w-5 h-5 rounded-full object-cover"
-                      alt=""
+                      alt={art.author?.name || "Author"}
+                      loading="lazy"
                     />
                     <span className="text-xs font-medium text-foreground">
                       {art.author?.name}
@@ -54,7 +55,7 @@ export default function PickedSidebar({ articles }: PickedSidebarProps) {
         <div className="p-6 bg-primary/10 rounded-xl border border-primary/20">
           <h4 className="font-bold text-foreground mb-2">Writing on Cognora</h4>
           <p className="text-sm text-muted-foreground mb-4">
-            Share your student journey or exam tips with everyone.
+            Share your knowledge — write articles about AI, tech, engineering, and more.
           </p>
           {isAuthenticated ? (
             <Link

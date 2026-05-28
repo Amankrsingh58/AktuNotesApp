@@ -111,11 +111,12 @@ export default function ArticleFeed({ initialArticles, isLoading = false }: Arti
             )}
           </div>
         ) : (
-          filteredArticles.map((article) => (
+          filteredArticles.map((article, index) => (
             <ArticleCard
               key={article._id}
               article={article}
               currentUserId={user?._id}
+              index={index}
             />
           ))
         )}

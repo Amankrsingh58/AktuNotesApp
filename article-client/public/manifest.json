@@ -1,0 +1,23 @@
+{
+  "name": "Cognora",
+  "short_name": "Cognora",
+  "description": "Explore the latest articles on AI, technologies, software engineering, and modern developer insights.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "categories": ["articles", "technology", "education"],
+  "icons": [
+    {
+      "src": "/mainlogo2.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/mainlogo2.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

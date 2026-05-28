@@ -136,6 +136,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
           {/* HOME VIEW */}
           {activeView === "home" && (
             <div className="flex flex-col justify-center lg:flex-row gap-12">
+              <h1 className="sr-only">Cognora - AI, Technology, and Software Engineering Articles</h1>
               {isPending ? (
                 <ArticleFeedSkeleton />
               ) : (
