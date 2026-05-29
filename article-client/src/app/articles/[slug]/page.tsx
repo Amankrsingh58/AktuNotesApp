@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!article) {
     return {
-      title: "Article Not Found | AKTU Notes",
+      title: "Article Not Found",
       description: "The requested article could not be found.",
     };
   }
@@ -322,7 +322,7 @@ export default async function Page({ params }: PageProps) {
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                     {article.author?.articleProfile?.bio ||
-                      "An engineering student sharing insights on AKTU exams and student life."}
+                      "An user sharing insights on Latest Technology."}
                   </p>
                   <div className="flex items-center justify-center md:justify-start gap-6 mt-4 flex-wrap">
                     <AuthorFollow

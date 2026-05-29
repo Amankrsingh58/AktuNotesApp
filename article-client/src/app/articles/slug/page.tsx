@@ -105,10 +105,10 @@ export default async function Page({ params }: PageProps) {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "AKTU Notes",
+      "name": "Cognora",
       "logo": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/logo.png`,
+        "url": `${siteUrl}/mainlogo2.png`,
       },
     },
     "mainEntityOfPage": {
@@ -230,7 +230,7 @@ export default async function Page({ params }: PageProps) {
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                     {article.author?.articleProfile?.bio ||
-                      "An engineering student sharing insights on AKTU exams and student life."}
+                      "An user sharing insights on Latest Technology."}
                   </p>
                   <div className="flex items-center justify-center md:justify-start gap-4">
                     <AuthorFollow
