@@ -275,6 +275,19 @@ export default async function Page({ params }: PageProps) {
                     alt={article.title}
                     className="w-full h-auto rounded-sm shadow-sm opacity-90 dark:opacity-80 transition-opacity group-hover:opacity-100"
                   />
+                  {article.coverImage.startsWith("http") && (
+                    <figcaption className="text-center text-sm text-muted-foreground mt-3 italic">
+                      Image source:{" "}
+                      {(() => {
+                        try {
+                          const url = new URL(article.coverImage);
+                          return url.hostname.replace("www.", "");
+                        } catch (e) {
+                          return "External Source";
+                        }
+                      })()}
+                    </figcaption>
+                  )}
                 </figure>
               )}
 
