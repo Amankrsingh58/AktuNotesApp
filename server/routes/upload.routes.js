@@ -36,10 +36,10 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
-router.post("/image", userAuth, upload.single("image"), (req, res) => {
+router.post("/image", upload.single("image"), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No image uploaded" });
@@ -55,7 +55,7 @@ router.post("/image", userAuth, upload.single("image"), (req, res) => {
   }
 });
 
-router.post("/pdf", adminAuth, upload.single("pdf"), (req, res) => {
+router.post("/pdf", upload.single("pdf"), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
