@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { getArticles } from "@/lib/api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in";
 
   // Fetch all published articles
   const articles = await getArticles();
