@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getArticles } from "@/lib/api";
 
 export async function GET() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in";
   const articles = await getArticles();
   
   const publishedArticles = articles.filter((a) => a.status === "published");
