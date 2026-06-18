@@ -22,27 +22,15 @@ type LinkFormState = {
 };
 
 const initialLinks: BioLink[] = [
+
   {
-    id: "official-community",
-    title: "Join the Cognora Community",
-    url: "https://cognora.in",
-    description: "Articles, updates, and resources for curious builders.",
+    id: "ClaudeCode",
+    title: "Claude Code Free",
+    url: "https://www.cognora.in/articles/how-to-get-claude-max-free-for-6-months-anthropics-1200-offer-for-open-source-developers-1781760837733",
+    description: "Steps to get Claude Max for free for 6 months, courtesy of Anthropic's offer for open-source developers.",
     isActive: true,
   },
-  {
-    id: "latest-articles",
-    title: "Read Latest Articles",
-    url: "https://cognora.in",
-    description: "Fresh notes on AI, software engineering, and tech trends.",
-    isActive: true,
-  },
-  {
-    id: "creator-notes",
-    title: "Creator Notes",
-    url: "https://cognora.in",
-    description: "Hidden draft link example for admin preview.",
-    isActive: false,
-  },
+
 ];
 
 const emptyForm: LinkFormState = {
