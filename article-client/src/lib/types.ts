@@ -13,8 +13,10 @@ export interface ArticleProfile {
 
 export interface User {
   _id: string;
+  id?: string;
   name: string;
   email: string;
+  role?: "admin" | "super_admin" | "articleUser" | string;
   bio?: string;
   profilePic?: string;
   year?: number;
