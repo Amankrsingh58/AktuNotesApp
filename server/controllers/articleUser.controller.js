@@ -29,6 +29,7 @@ const registerArticleUser = async (req, res) => {
             email,
             password: hashedPassword,
             bio: bio || "",
+            role: "articleUser"
         });
         await user.save();
 
@@ -42,6 +43,7 @@ const registerArticleUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 bio: user.bio,
+                role: user.role,
                 profilePic: user.profilePic,
                 articleProfile: user.articleProfile,
                 followers: user.followers,
@@ -62,7 +64,7 @@ const loginArticleUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = jwt.sign({ id: user._id, role: "articleUser" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.cookie("articleUserToken", token, getCookieOptions());
 
         res.json({
@@ -72,6 +74,7 @@ const loginArticleUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 bio: user.bio,
+                role: user.role,
                 profilePic: user.profilePic,
                 articleProfile: user.articleProfile,
                 followers: user.followers,
@@ -103,6 +106,7 @@ const getArticleMe = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 bio: user.bio,
+                role: user.role,
                 profilePic: user.profilePic,
                 articleProfile: user.articleProfile,
                 followers: user.followers,

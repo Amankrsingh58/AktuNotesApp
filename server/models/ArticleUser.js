@@ -6,6 +6,7 @@ const ArticleUserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     bio: { type: String, default: "" },
     profilePic: { type: String },
+    role: { type: String, enum: ["admin", "super_admin", "articleUser"], default: "articleUser" },
     articleProfile: {
         bio: { type: String },
         avatar: { type: String },
