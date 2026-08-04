@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const ogImage = article.coverImage || `${siteUrl}/default-og.png`;
+  const ogImage = article.coverImage || `${siteUrl}/mainlogo2.png`;
 
   return {
     title: article.seoTitle || article.title,
@@ -102,7 +102,7 @@ export default async function Page({ params }: PageProps) {
     "@type": "NewsArticle",
     "headline": article.title,
     "description": article.summary,
-    "image": article.coverImage || `${siteUrl}/default-og.png`,
+    "image": article.coverImage || `${siteUrl}/mainlogo2.png`,
     "datePublished": article.createdAt,
     "dateModified": article.updatedAt,
     "author": {
@@ -399,7 +399,7 @@ export default async function Page({ params }: PageProps) {
                             <Link href={`/articles/${art.slug}`}>
                               <div className="aspect-[16/9] w-full rounded-sm overflow-hidden bg-muted shadow-sm group relative">
                                 <img
-                                  src={art.coverImage || "/default-cover.png"}
+                                  src={art.coverImage || "/mainlogo2.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   alt={art.title}
                                   loading="lazy"
@@ -451,7 +451,7 @@ export default async function Page({ params }: PageProps) {
                             <Link href={`/articles/${art.slug}`}>
                               <div className="aspect-[16/9] w-full rounded-sm overflow-hidden bg-muted shadow-sm group relative">
                                 <img
-                                  src={art.coverImage || "/default-cover.png"}
+                                  src={art.coverImage || "/mainlogo2.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   alt={art.title}
                                   loading="lazy"

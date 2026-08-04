@@ -14,6 +14,15 @@ const nextConfig = {
       }
     ],
   },
+  async redirects() {
+    return [
+      { source: "/about-us", destination: "/about", permanent: true },
+      { source: "/contact-us", destination: "/contact", permanent: true },
+      { source: "/privacy-policy", destination: "/privacy", permanent: true },
+      { source: "/terms-of-service", destination: "/terms", permanent: true },
+      { source: "/cookies", destination: "/cookie-policy", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

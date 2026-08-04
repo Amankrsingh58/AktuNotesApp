@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+.content-page h2 {
+  @apply mb-3 mt-10 text-2xl font-bold tracking-tight text-foreground;
+}
+
+.content-page p + p {
+  @apply mt-4;
+}
+
+.content-page a {
+  @apply font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary;
+}
+
+.content-page ul {
+  @apply ml-6 list-disc space-y-2;
+}
+
 /* ===============================
 LIGHT THEME TOKENS
 =============================== */

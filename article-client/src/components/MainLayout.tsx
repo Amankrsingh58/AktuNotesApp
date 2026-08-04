@@ -15,6 +15,8 @@ import ArticleFeedSkeleton from "./ArticleFeedSkeleton";
 import PickedSidebar from "./PickedSidebar";
 import Icon from "./Icons";
 import CircleDotsPreloader from "./CircleDotsPreloader";
+import HomeContent from "./HomeContent";
+import SiteFooter from "./SiteFooter";
 import toast from "react-hot-toast";
 
 interface MainLayoutProps {
@@ -135,16 +137,19 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
 
           {/* HOME VIEW */}
           {activeView === "home" && (
-            <div className="flex flex-col justify-center lg:flex-row gap-12">
+            <div>
               <h1 className="sr-only">Cognora - AI, Technology, and Software Engineering Articles</h1>
-              {isPending ? (
-                <ArticleFeedSkeleton />
-              ) : (
-                <Suspense fallback={<ArticleFeedSkeleton />}>
-                  <ArticleFeed initialArticles={initialArticles} />
-                </Suspense>
-              )}
-              <PickedSidebar articles={initialArticles} />
+              <div className="flex flex-col justify-center lg:flex-row gap-12">
+                {isPending ? (
+                  <ArticleFeedSkeleton />
+                ) : (
+                  <Suspense fallback={<ArticleFeedSkeleton />}>
+                    <ArticleFeed initialArticles={initialArticles} />
+                  </Suspense>
+                )}
+                <PickedSidebar articles={initialArticles} />
+              </div>
+              <HomeContent articles={initialArticles} />
             </div>
           )}
 
@@ -428,6 +433,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
             </div>
           )}
         </div>
+        {activeView === "home" && <SiteFooter />}
       </main>
     </div>
   );
