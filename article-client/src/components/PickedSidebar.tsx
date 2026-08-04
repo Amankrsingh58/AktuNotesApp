@@ -35,7 +35,10 @@ export default function PickedSidebar({ articles }: PickedSidebarProps) {
                       src={authorPic}
                       className="w-5 h-5 rounded-full object-cover"
                       alt={art.author?.name || "Author"}
+                      width={20}
+                      height={20}
                       loading="lazy"
+                      decoding="async"
                     />
                     <span className="text-xs font-medium text-foreground">
                       {art.author?.name}

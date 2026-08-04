@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 .content-page h2 {
-  @apply mb-3 mt-10 text-2xl font-bold tracking-tight text-foreground;
+  @apply mb-3 text-2xl font-bold tracking-tight text-foreground;
+}
+
+.content-page h3 {
+  @apply mb-2 mt-6 text-lg font-semibold text-foreground;
 }
 
 .content-page p + p {
@@ -16,6 +20,48 @@
 
 .content-page ul {
   @apply ml-6 list-disc space-y-2;
+}
+
+.content-page > section {
+  @apply mb-5 rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm transition-colors md:p-8;
+}
+
+.content-page > section:hover {
+  @apply border-border bg-card;
+}
+
+.content-page > section > h2:first-child {
+  @apply flex items-center gap-3;
+}
+
+.content-page > section > h2:first-child::before {
+  content: "";
+  @apply h-6 w-1 shrink-0 rounded-full bg-primary;
+}
+
+.content-page > div:first-child {
+  @apply space-y-3;
+}
+
+.content-page details {
+  @apply border-border/60 bg-card/70 shadow-sm transition-all;
+}
+
+.content-page details[open] {
+  @apply border-primary/30 bg-card;
+}
+
+.content-page details summary {
+  position: relative;
+}
+
+.content-page details summary::after {
+  content: "+";
+  @apply absolute right-0 top-0 text-xl font-normal text-primary transition-transform;
+}
+
+.content-page details[open] summary::after {
+  content: "−";
 }
 
 /* ===============================

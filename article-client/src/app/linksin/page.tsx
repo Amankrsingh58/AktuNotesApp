@@ -135,6 +135,9 @@ export default function LinksinPage() {
             <img
               src="/mainlogo.jpeg"
               alt="Cognora"
+              width={96}
+              height={96}
+              decoding="async"
               className="h-full w-full object-cover"
             />
           </div>

@@ -65,6 +65,8 @@ export default function ArticleCard({ article, currentUserId, index = 0 }: Artic
             <img
               src={authorPic}
               alt={article.author?.name || "Author"}
+              width={20}
+              height={20}
               className="w-5 h-5 rounded-full object-cover"
               loading={loadingType}
               decoding="async"
@@ -169,6 +171,8 @@ export default function ArticleCard({ article, currentUserId, index = 0 }: Artic
             <img
               src={article.coverImage}
               alt={article.title}
+              width={640}
+              height={448}
               className="w-full h-full object-cover rounded shadow-sm opacity-90 dark:opacity-80 group-hover:opacity-100 transition-opacity"
               loading={loadingType}
               decoding="async"

@@ -200,6 +200,9 @@ export default async function Page({ params }: PageProps) {
                   <img
                     src={authorPic}
                     alt={article.author?.name}
+                    width={44}
+                    height={44}
+                    decoding="async"
                     className="w-11 h-11 rounded-full object-cover"
                   />
                   <div className="flex flex-col">
@@ -273,6 +276,10 @@ export default async function Page({ params }: PageProps) {
                   <img
                     src={article.coverImage}
                     alt={article.title}
+                    width={1200}
+                    height={630}
+                    fetchPriority="high"
+                    decoding="async"
                     className="w-full h-auto rounded-sm shadow-sm opacity-90 dark:opacity-80 transition-opacity group-hover:opacity-100"
                   />
                   {article.coverImage.startsWith("http") && (
@@ -314,6 +321,10 @@ export default async function Page({ params }: PageProps) {
                 <img
                   src={authorPic}
                   alt={article.author?.name}
+                  width={80}
+                  height={80}
+                  loading="lazy"
+                  decoding="async"
                   className="w-20 h-20 rounded-full object-cover"
                 />
                 <div className="flex-1">
@@ -402,7 +413,10 @@ export default async function Page({ params }: PageProps) {
                                   src={art.coverImage || "/mainlogo2.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   alt={art.title}
+                                  width={640}
+                                  height={360}
                                   loading="lazy"
+                                  decoding="async"
                                 />
                               </div>
                             </Link>
@@ -411,7 +425,10 @@ export default async function Page({ params }: PageProps) {
                                 src={recAuthorPic}
                                 className="w-5 h-5 rounded-full object-cover"
                                 alt={art.author?.name || "Author"}
+                                width={20}
+                                height={20}
                                 loading="lazy"
+                                decoding="async"
                               />
                               <span className="text-[13px] font-medium text-foreground">
                                 {art.author?.name}
@@ -454,7 +471,10 @@ export default async function Page({ params }: PageProps) {
                                   src={art.coverImage || "/mainlogo2.png"}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   alt={art.title}
+                                  width={640}
+                                  height={360}
                                   loading="lazy"
+                                  decoding="async"
                                 />
                               </div>
                             </Link>
@@ -463,7 +483,10 @@ export default async function Page({ params }: PageProps) {
                                 src={recAuthorPic}
                                 className="w-5 h-5 rounded-full object-cover"
                                 alt={art.author?.name || "Author"}
+                                width={20}
+                                height={20}
                                 loading="lazy"
+                                decoding="async"
                               />
                               <span className="text-[13px] font-medium text-foreground">
                                 {art.author?.name}

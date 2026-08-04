@@ -190,7 +190,10 @@ function WritePageContent() {
         {coverImage && (
           <img
             src={coverImage}
-            alt=""
+            alt="Article cover preview"
+            width={1200}
+            height={630}
+            decoding="async"
             className="w-full h-auto object-cover rounded-lg mb-10 shadow"
           />
         )}

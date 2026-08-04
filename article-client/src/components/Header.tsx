@@ -96,12 +96,18 @@ export default function Header() {
                 <img
                   src="/mainlogo.jpeg"
                   alt="Cognoras logo"
+                  width={40}
+                  height={40}
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               </div>
               <img
                 src={theme === "dark" ? "/lightlogo3.png" : "/darklogo.png"}
                 alt="Cognoras"
+                width={160}
+                height={40}
+                decoding="async"
                 className="h-[8.5rem] object-contain"
               />
             </Link>

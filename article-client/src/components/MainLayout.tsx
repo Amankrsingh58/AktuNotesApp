@@ -184,6 +184,10 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                         )}&background=random`
                       }
                       alt=""
+                      width={64}
+                      height={64}
+                      loading="lazy"
+                      decoding="async"
                       className="w-16 h-16 rounded-full object-cover border border-border"
                     />
                     <div>

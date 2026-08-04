@@ -70,6 +70,19 @@ export default function HomeContent({ articles }: { articles: Article[] }) {
         </div>
       </section>
 
+      <section aria-labelledby="home-faq" className="grid gap-8 md:grid-cols-[0.75fr_1.25fr]">
+        <div>
+          <p className="text-sm font-semibold text-primary">Good to know</p>
+          <h2 id="home-faq" className="mt-1 text-3xl font-bold">Frequently asked questions</h2>
+          <Link href="/faq" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">View the complete FAQ</Link>
+        </div>
+        <div className="divide-y divide-border/60 border-y border-border/60">
+          <div className="py-5"><h3 className="font-semibold">What is Cognora?</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">An open publishing community for practical insight about AI, software engineering, and emerging technology.</p></div>
+          <div className="py-5"><h3 className="font-semibold">Do I need an account to read?</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">No. Published articles are public. Accounts unlock writing, following, commenting, and story management.</p></div>
+          <div className="py-5"><h3 className="font-semibold">Can I contribute an article?</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">Yes. Sign in and use the writing tools to turn useful experience into a clear story for the community.</p></div>
+        </div>
+      </section>
+
       <section className="rounded-3xl border border-primary/20 bg-primary/5 px-6 py-12 text-center md:px-12">
         <h2 className="text-3xl font-bold">Have something worth sharing?</h2>
         <p className="mx-auto mt-3 max-w-xl leading-7 text-muted-foreground">Turn your experience into a clear, useful article for the Cognora community.</p>

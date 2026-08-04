@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign Up | Cognora",
+  title: "Sign Up",
   description: "Create a Cognora account to start writing and sharing your tech insights.",
   robots: {
     index: false,

@@ -72,7 +72,11 @@ export default function CommentSection({
                 )}&background=random`
               }
               className="w-7 h-7 rounded-full object-cover"
-              alt=""
+              alt={user?.name ? `${user.name} profile` : "Your profile"}
+              width={28}
+              height={28}
+              loading="lazy"
+              decoding="async"
             />
             <span className="text-xs font-medium">{user?.name}</span>
           </div>
@@ -134,7 +138,11 @@ export default function CommentSection({
                   <div className="flex items-center gap-3">
                     <img
                       src={authorPic}
-                      alt=""
+                      alt={`${comment.user?.name || "Comment author"} profile`}
+                      width={32}
+                      height={32}
+                      loading="lazy"
+                      decoding="async"
                       className="w-8 h-8 rounded-full shadow-sm object-cover"
                     />
                     <div>
