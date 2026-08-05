@@ -25,12 +25,20 @@ const footerGroups = [
       { href: "/cookie-policy", label: "Cookie policy" },
     ],
   },
+  {
+    title: "Categories",
+    links: [
+      { href: "/?q=AI", label: "AI & Agents" },
+      { href: "/?q=Developer", label: "Developer Tools" },
+      { href: "/?q=Software%20Engineering", label: "Software Engineering" },
+    ],
+  },
 ];
 
 export default function SiteFooter() {
   return (
     <footer className="border-t border-border/60 bg-card" role="contentinfo">
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 md:grid-cols-[1.5fr_2fr] md:px-8">
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1.2fr_2fr]">
         <div>
           <Link href="/" className="text-xl font-bold tracking-tight text-foreground">
             Cognora
@@ -40,7 +48,7 @@ export default function SiteFooter() {
             engineering, emerging technology, and the people building what comes next.
           </p>
         </div>
-        <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {footerGroups.map((group) => (
             <div key={group.title}>
               <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>

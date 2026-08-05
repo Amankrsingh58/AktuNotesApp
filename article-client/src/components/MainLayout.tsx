@@ -16,7 +16,6 @@ import PickedSidebar from "./PickedSidebar";
 import Icon from "./Icons";
 import CircleDotsPreloader from "./CircleDotsPreloader";
 import HomeContent from "./HomeContent";
-import SiteFooter from "./SiteFooter";
 import toast from "react-hot-toast";
 
 interface MainLayoutProps {
@@ -437,7 +436,6 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
             </div>
           )}
         </div>
-        {activeView === "home" && <SiteFooter />}
       </main>
     </div>
   );

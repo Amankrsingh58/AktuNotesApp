@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
+import SiteFooter from "@/components/SiteFooter";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -99,6 +100,7 @@ export default function RootLayout({
           <AuthProvider>
             <Toaster position="top-center" />
             {children}
+            <SiteFooter />
           </AuthProvider>
         </ThemeProvider>
       </body>

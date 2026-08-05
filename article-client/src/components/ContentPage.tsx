@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Header from "./Header";
-import SiteFooter from "./SiteFooter";
 import JsonLd from "./JsonLd";
 
 interface ContentPageProps {
@@ -91,7 +90,6 @@ export default function ContentPage({
           </article>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

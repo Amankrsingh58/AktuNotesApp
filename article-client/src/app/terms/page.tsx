@@ -19,6 +19,6 @@ export default function TermsPage() {
     <section><h2>Service changes and availability</h2><p>We may update, add, or discontinue features and may perform maintenance. We work to provide a reliable service but do not guarantee uninterrupted or error-free availability. Cognora is provided “as is” and “as available” to the extent permitted by law.</p></section>
     <section><h2>Limitation of liability</h2><p>To the fullest extent permitted by law, Cognora and its operators will not be liable for indirect, incidental, special, consequential, or punitive damages, or for loss of data, profits, goodwill, or business opportunity arising from use of the service. Nothing here excludes liability that cannot legally be excluded.</p></section>
     <section><h2>Ending use and changes</h2><p>You may stop using Cognora at any time. Provisions that by their nature should survive termination will survive. We may revise these Terms and will update the date above; material changes will be communicated where required. Continued use after an effective update means you accept the revised Terms.</p></section>
-    <section><h2>Contact</h2><p>Questions about these Terms can be sent to <a href="mailto:team@cognora.in">team@cognora.in</a> or through our <Link href="/contact">contact page</Link>.</p></section>
+    <section><h2>Contact</h2><p>Questions about these Terms can be sent to <a href="mailto:amankrsingh58@gmail.com">amankrsingh58@gmail.com</a> or through our <Link href="/contact">contact page</Link>.</p></section>
   </ContentPage>;
 }
