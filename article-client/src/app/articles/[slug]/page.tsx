@@ -13,6 +13,7 @@ import AuthorFollow from "@/components/AuthorFollow";
 import AuthorBanner from "@/components/AuthorBanner";
 import Icon from "@/components/Icons";
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const ogImage = article.coverImage || `${siteUrl}/mainlogo2.png`;
 
   return {
@@ -94,7 +95,7 @@ export default async function Page({ params }: PageProps) {
 
   const recommendations = allArticles.filter((a) => a._id !== article._id).slice(0, 4);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = getSiteUrl();
 
   // Create Article Schema Markup for Google Rich Results
   const articleSchema = {
@@ -314,6 +315,7 @@ export default async function Page({ params }: PageProps) {
                     {tag}
                   </span>
                 ))}
+                <a href={`mailto:amankrsingh58@gmail.com?subject=${encodeURIComponent(`Report article: ${article.title}`)}`} className="ml-auto px-3 py-2 text-xs font-medium text-muted-foreground hover:text-primary">Report this article</a>
               </div>
 
               {/* Author Bio Bottom */}

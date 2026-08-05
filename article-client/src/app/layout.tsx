@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import SiteFooter from "@/components/SiteFooter";
+import { getSiteUrl } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,9 +35,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Cognora Team" }],
   creator: "Cognora",
   publisher: "Cognora",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in"
-  ),
+  metadataBase: new URL(getSiteUrl()),
   icons: {
     icon: "/mainlogo2.png",
     apple: "/mainlogo2.png",

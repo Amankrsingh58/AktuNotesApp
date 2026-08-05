@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "./Header";
 import JsonLd from "./JsonLd";
+import { getSiteUrl } from "@/lib/site";
 
 interface ContentPageProps {
   title: string;
@@ -30,7 +31,7 @@ export default function ContentPage({
   schemaType = "WebPage",
   schema,
 }: ContentPageProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in";
+  const siteUrl = getSiteUrl();
   const pageSchema = schema || {
     "@context": "https://schema.org",
     "@type": schemaType,

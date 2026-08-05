@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Icon from "@/components/Icons";
 import RichTextEditor from "@/components/RichTextEditor";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 function WritePageContent() {
   const router = useRouter();
@@ -254,6 +255,12 @@ function WritePageContent() {
           </button>
         </div>
       </div>
+
+      <aside className="mb-8 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-sm text-muted-foreground">
+        <h3 className="font-semibold text-foreground">Publish responsibly</h3>
+        <p className="mt-2 leading-6">Share original work you have the right to publish. Support factual claims, credit sources, disclose relevant interests, and do not publish copied, deceptive, harmful, or policy-violating material.</p>
+        <p className="mt-2 text-xs">Publishing means you agree to Cognora&apos;s <Link href="/terms" target="_blank" className="font-semibold text-primary hover:underline">Terms</Link> and <Link href="/about" target="_blank" className="font-semibold text-primary hover:underline">editorial standards</Link>.</p>
+      </aside>
 
       <textarea
         ref={titleRef}

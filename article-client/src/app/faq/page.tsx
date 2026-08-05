@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContentPage from "@/components/ContentPage";
+import { getSiteUrl } from "@/lib/site";
 
 const faqs = [
   { q: "What is Cognora?", a: "Cognora is a publishing community for practical articles about artificial intelligence, software engineering, emerging technology, and digital products." },
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default function FAQPage() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cognora.in";
+  const siteUrl = getSiteUrl();
   const schema = { "@context": "https://schema.org", "@type": "FAQPage", url: `${siteUrl}/faq`, mainEntity: faqs.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) };
   return <ContentPage title="Frequently asked questions" description="Quick answers about reading, publishing, accounts, privacy, and how Cognora works." path="/faq" schemaType="FAQPage" schema={schema}>
     <div className="space-y-4">{faqs.map(({ q, a }) => <details key={q} className="group rounded-xl border border-border/60 bg-card p-5"><summary className="cursor-pointer list-none pr-8 text-lg font-semibold">{q}</summary><p className="mt-3 text-muted-foreground">{a}</p></details>)}</div>

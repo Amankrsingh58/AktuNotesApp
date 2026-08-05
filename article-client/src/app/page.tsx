@@ -6,6 +6,7 @@ import AuthModal from "@/components/AuthModal";
 import JsonLd from "@/components/JsonLd";
 import MainLayout from "@/components/MainLayout";
 import CircleDotsPreloader from "@/components/CircleDotsPreloader";
+import { getSiteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const articles = await getArticles();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = getSiteUrl();
 
   // Create CollectionPage Schema Markup for SEO
   const collectionSchema = {

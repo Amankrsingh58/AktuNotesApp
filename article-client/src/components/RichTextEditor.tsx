@@ -129,9 +129,18 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => {
-            const url = prompt("Enter URL:", "https://");
-            if (url) {
-              execCommand("createLink", url);
+            const value = prompt("Enter a secure URL:", "https://");
+            if (!value) return;
+
+            try {
+              const url = new URL(value);
+              if (!['http:', 'https:'].includes(url.protocol)) {
+                alert("Only http:// and https:// links are allowed.");
+                return;
+              }
+              execCommand("createLink", url.toString());
+            } catch {
+              alert("Please enter a valid URL, including https://.");
             }
           }}
           className="p-2 hover:bg-muted rounded-lg transition-colors text-foreground"

@@ -63,6 +63,13 @@ const calculateReadTime = (content) => {
     return Math.ceil(words / wordsPerMinute);
 };
 
+// The editor only produces basic formatting HTML. Reject executable or embedded
+// markup at the API boundary so it cannot be injected through a custom client.
+const containsUnsafeHtml = (content) => {
+    if (!content || typeof content !== "string") return false;
+    return /<\s*(script|iframe|object|embed|form|input|button|svg|math)\b|\bon\w+\s*=|javascript\s*:/i.test(content);
+};
+
 // Create article
 exports.createArticle = async (req, res) => {
     try {
@@ -70,6 +77,10 @@ exports.createArticle = async (req, res) => {
 
         if (!title || !content || !summary) {
             return res.status(400).json({ message: "Title, content and summary are required" });
+        }
+
+        if (containsUnsafeHtml(content)) {
+            return res.status(400).json({ message: "Article content contains unsupported or unsafe markup" });
         }
 
         // Generate slug and ensure uniqueness
@@ -109,6 +120,11 @@ exports.updateArticle = async (req, res) => {
 
         if (!article) {
             return res.status(404).json({ message: "Article not found" });
+        }
+
+
+        if (content && containsUnsafeHtml(content)) {
+            return res.status(400).json({ message: "Article content contains unsupported or unsafe markup" });
         }
 
         // Check if author
