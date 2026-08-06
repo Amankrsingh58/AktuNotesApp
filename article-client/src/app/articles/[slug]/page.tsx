@@ -14,6 +14,7 @@ import AuthorBanner from "@/components/AuthorBanner";
 import Icon from "@/components/Icons";
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site";
+import { isArticleIndexable } from "@/lib/articleQuality";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -71,6 +72,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: article.summary,
       images: [ogImage],
     },
+    robots: isArticleIndexable(article)
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
   };
 }
 

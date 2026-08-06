@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getArticles } from "@/lib/api";
 import { getSiteUrl } from "@/lib/site";
+import { isArticleIndexable } from "@/lib/articleQuality";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
@@ -10,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Create article URLs
   const articleUrls = articles
-    .filter((a) => a.status === "published")
+    .filter((a) => a.status === "published" && isArticleIndexable(a))
     .map((art) => ({
       url: `${siteUrl}/articles/${art.slug}`,
       lastModified: new Date(art.updatedAt),

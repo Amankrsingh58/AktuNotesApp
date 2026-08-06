@@ -70,6 +70,23 @@ const containsUnsafeHtml = (content) => {
     return /<\s*(script|iframe|object|embed|form|input|button|svg|math)\b|\bon\w+\s*=|javascript\s*:/i.test(content);
 };
 
+const getPlainTextWordCount = (content = "") => {
+    const text = content
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&[a-z0-9#]+;/gi, " ")
+        .trim();
+    return text ? text.split(/\s+/).filter(Boolean).length : 0;
+};
+
+const getPublishedArticleQualityIssue = ({ title, summary, content }) => {
+    if ((title || "").trim().length < 12) return "Published articles need a descriptive title of at least 12 characters";
+    if ((summary || "").trim().length < 60) return "Published articles need an informative summary of at least 60 characters";
+    if (getPlainTextWordCount(content) < 300) return "Published articles need at least 300 meaningful words";
+    return null;
+};
+
 // Create article
 exports.createArticle = async (req, res) => {
     try {
@@ -81,6 +98,11 @@ exports.createArticle = async (req, res) => {
 
         if (containsUnsafeHtml(content)) {
             return res.status(400).json({ message: "Article content contains unsupported or unsafe markup" });
+        }
+
+        if ((status || "published") === "published") {
+            const qualityIssue = getPublishedArticleQualityIssue({ title, summary, content });
+            if (qualityIssue) return res.status(400).json({ message: qualityIssue });
         }
 
         // Generate slug and ensure uniqueness
@@ -125,6 +147,17 @@ exports.updateArticle = async (req, res) => {
 
         if (content && containsUnsafeHtml(content)) {
             return res.status(400).json({ message: "Article content contains unsupported or unsafe markup" });
+        }
+
+
+        const nextStatus = status || article.status;
+        if (nextStatus === "published") {
+            const qualityIssue = getPublishedArticleQualityIssue({
+                title: title || article.title,
+                summary: summary || article.summary,
+                content: content || article.content
+            });
+            if (qualityIssue) return res.status(400).json({ message: qualityIssue });
         }
 
         // Check if author

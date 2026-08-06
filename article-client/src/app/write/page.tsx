@@ -8,6 +8,7 @@ import Icon from "@/components/Icons";
 import RichTextEditor from "@/components/RichTextEditor";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { getArticleQualityIssue } from "@/lib/articleQuality";
 
 function WritePageContent() {
   const router = useRouter();
@@ -119,6 +120,14 @@ function WritePageContent() {
     if (status === "published" && (!title || !content || !summary)) {
       toast.error("Please fill in the title, summary, and content before publishing.");
       return;
+    }
+
+    if (status === "published") {
+      const qualityIssue = getArticleQualityIssue({ title, summary, content });
+      if (qualityIssue) {
+        toast.error(qualityIssue);
+        return;
+      }
     }
 
     if (status === "draft" && !title) {
