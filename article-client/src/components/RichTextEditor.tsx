@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Icon from "./Icons";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,10 @@ export default function RichTextEditor({
   placeholder = "Tell your story...",
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const savedSelectionRef = useRef<Range | null>(null);
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [codeLanguage, setCodeLanguage] = useState("JavaScript");
+  const [codeValue, setCodeValue] = useState("");
 
   // Sync editor content with external value
   useEffect(() => {
@@ -27,6 +31,16 @@ export default function RichTextEditor({
       }
     }
   }, [value]);
+
+  useEffect(() => {
+    if (!isCodeModalOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsCodeModalOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isCodeModalOpen]);
 
   const handleInput = () => {
     if (editorRef.current) {
@@ -49,26 +63,65 @@ export default function RichTextEditor({
     editorRef.current?.focus();
   };
 
+  const openCodeModal = () => {
+    const selection = window.getSelection();
+    if (selection?.rangeCount && editorRef.current?.contains(selection.anchorNode)) {
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+    setIsCodeModalOpen(true);
+  };
+
+  const closeCodeModal = () => {
+    setIsCodeModalOpen(false);
+    setCodeValue("");
+  };
+
   const insertCodeBlock = () => {
-    const languageInput = prompt("Language label (for example: JavaScript):", "JavaScript");
-    if (languageInput === null) return;
+    if (!codeValue.trim()) return;
 
-    const code = prompt("Paste the code for this block:");
-    if (!code) return;
-
-    const language = languageInput.trim().replace(/[^a-z0-9+#.-]/gi, "").slice(0, 24) || "code";
-    const escapedCode = code
+    const language = codeLanguage.trim().replace(/[^a-z0-9+#.-]/gi, "").slice(0, 24) || "code";
+    const escapedCode = codeValue
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-    execCommand(
-      "insertHTML",
-      `<pre data-language="${language}"><code class="language-${language.toLowerCase()}">${escapedCode}</code></pre><p><br></p>`
-    );
+    const selection = window.getSelection();
+    if (selection && savedSelectionRef.current) {
+      selection.removeAllRanges();
+      selection.addRange(savedSelectionRef.current);
+    }
+
+    execCommand("insertHTML", `<pre data-language="${language}"><code class="language-${language.toLowerCase()}">${escapedCode}</code></pre><p><br></p>`);
     handleInput();
+    closeCodeModal();
+  };
+
+  const resetNewLineColor = () => {
+    window.setTimeout(() => {
+      const editor = editorRef.current;
+      const selection = window.getSelection();
+      const anchor = selection?.anchorNode;
+      if (!editor || !anchor || !editor.contains(anchor)) return;
+
+      const anchorElement = anchor.nodeType === Node.ELEMENT_NODE
+        ? (anchor as Element)
+        : anchor.parentElement;
+      const block = anchorElement?.closest("p, div, li, h1, h2, h3, blockquote");
+      if (!block || block === editor) return;
+
+      const colorAncestor = anchorElement?.closest("font[color], span[style*='color']");
+      if (colorAncestor && colorAncestor !== block && colorAncestor.contains(block)) {
+        colorAncestor.parentNode?.insertBefore(block, colorAncestor.nextSibling);
+      }
+
+      block.querySelectorAll<HTMLElement>("font[color], span[style*='color']").forEach((element) => {
+        element.removeAttribute("color");
+        element.style.removeProperty("color");
+      });
+      handleInput();
+    }, 0);
   };
 
   return (
@@ -78,10 +131,12 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => execCommand("removeFormat")}
-          className="p-2 hover:bg-muted rounded-lg transition-colors text-red-500"
-          title="Clear Formatting"
+          className="flex items-center gap-1.5 p-2 hover:bg-muted rounded-lg transition-colors text-red-500"
+          title="Reset Formatting"
+          aria-label="Reset formatting"
         >
           <Icon name="Eraser" size={18} />
+          <span className="hidden text-xs font-semibold sm:inline">Reset</span>
         </button>
         <button
           type="button"
@@ -190,7 +245,7 @@ export default function RichTextEditor({
         <div className="w-px h-6 bg-border mx-1"></div>
         <button
           type="button"
-          onClick={insertCodeBlock}
+          onClick={openCodeModal}
           className="p-2 hover:bg-muted rounded-lg transition-colors text-foreground"
           title="Insert Code Block"
           aria-label="Insert code block"
@@ -203,6 +258,9 @@ export default function RichTextEditor({
         ref={editorRef}
         contentEditable
         onInput={handleInput}
+        onKeyUp={(event) => {
+          if (event.key === "Enter") resetNewLineColor();
+        }}
         onPaste={(e) => {
           e.preventDefault();
           const text = e.clipboardData.getData("text/plain");
@@ -214,6 +272,68 @@ export default function RichTextEditor({
         )}
         data-placeholder={placeholder}
       />
+
+      {isCodeModalOpen && (
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeCodeModal();
+        }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="code-modal-title" className="w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
+              <div>
+                <h2 id="code-modal-title" className="text-lg font-bold text-foreground">Insert code block</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Choose a language label and paste code exactly as readers should see it.</p>
+              </div>
+              <button type="button" onClick={closeCodeModal} className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Close code dialog">
+                <Icon name="X" size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4 p-5 sm:p-6">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-foreground">Language</span>
+                <input
+                  list="code-language-options"
+                  value={codeLanguage}
+                  onChange={(event) => setCodeLanguage(event.target.value)}
+                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  placeholder="JavaScript, Bash, JSON..."
+                  autoFocus
+                />
+                <datalist id="code-language-options">
+                  <option value="JavaScript" />
+                  <option value="TypeScript" />
+                  <option value="Bash" />
+                  <option value="JSON" />
+                  <option value="HTML" />
+                  <option value="CSS" />
+                  <option value="Python" />
+                  <option value="PowerShell" />
+                  <option value="SQL" />
+                  <option value="Text" />
+                </datalist>
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-foreground">Code</span>
+                <textarea
+                  value={codeValue}
+                  onChange={(event) => setCodeValue(event.target.value)}
+                  className="min-h-72 w-full resize-y rounded-xl border border-slate-700 bg-[#0b1220] p-4 font-mono text-sm leading-6 text-slate-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  placeholder={'const message = "Hello, Cognora";'}
+                  spellCheck={false}
+                />
+              </label>
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-border bg-muted/20 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+              <button type="button" onClick={closeCodeModal} className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted">Cancel</button>
+              <button type="button" onClick={insertCodeBlock} disabled={!codeValue.trim()} className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45">
+                Insert code
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       <style jsx global>{`
         [contenteditable]:empty:before {
