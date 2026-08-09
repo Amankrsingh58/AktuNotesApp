@@ -1,6 +1,6 @@
 "use client";
 
-import Script from "next/script";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const excludedRoutes = ["/login", "/signup", "/write", "/linksin"];
@@ -11,14 +11,31 @@ export default function AdSenseScript() {
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  if (!isContentRoute) return null;
+  useEffect(() => {
+    const scriptId = "cognora-adsense-script";
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+    );
 
-  return (
-    <Script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5710259143928036"
-      crossOrigin="anonymous"
-      strategy="afterInteractive"
-    />
-  );
+    if (!isContentRoute) {
+      existingScript?.remove();
+      return;
+    }
+
+    if (existingScript) {
+      existingScript.id = scriptId;
+      existingScript.removeAttribute("data-nscript");
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.async = true;
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5710259143928036";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }, [isContentRoute]);
+
+  return null;
 }
