@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { getArticles } from "@/lib/api";
 import { getSiteUrl } from "@/lib/site";
+import { isArticleIndexable } from "@/lib/articleQuality";
 
 export async function GET() {
   const siteUrl = getSiteUrl();
   const articles = await getArticles();
   
-  const publishedArticles = articles.filter((a) => a.status === "published");
+  const publishedArticles = articles.filter(
+    (article) => article.status === "published" && isArticleIndexable(article)
+  );
 
   const escapeXml = (str: string) =>
     str
@@ -52,7 +55,7 @@ ${mediaThumbnail}
   <description>Explore the latest articles on AI, emerging technologies, software engineering, coding tutorials, and modern developer insights on Cognora.</description>
   <language>en-us</language>
   <copyright>Copyright ${new Date().getFullYear()} Cognora. All rights reserved.</copyright>
-  <managingEditor>team@cognora.in (Cognora Team)</managingEditor>
+  <managingEditor>amankrsingh58@gmail.com (Cognora Team)</managingEditor>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml" />
   <image>

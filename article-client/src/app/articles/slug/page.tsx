@@ -85,7 +85,9 @@ export default async function Page({ params }: PageProps) {
   }
 
   // Get all recommendations
-  const allArticles = await getArticles();
+  const allArticles = (await getArticles()).filter(
+    (candidate) => candidate.status === "published" && isArticleIndexable(candidate)
+  );
   const moreFromAuthor = allArticles
     .filter((a) => a.author?._id === article.author?._id && a._id !== article._id)
     .slice(0, 4);

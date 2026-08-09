@@ -17,6 +17,7 @@ import Icon from "./Icons";
 import CircleDotsPreloader from "./CircleDotsPreloader";
 import HomeContent from "./HomeContent";
 import toast from "react-hot-toast";
+import { getArticleWordCount } from "@/lib/articleQuality";
 
 interface MainLayoutProps {
   initialArticles: Article[];
@@ -383,6 +384,9 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                                       year: "numeric",
                                     }
                                   )}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {getArticleWordCount(art.content).toLocaleString()} words
                                 </span>
                               </div>
                               <h3

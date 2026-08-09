@@ -40,7 +40,7 @@ function SearchInput({ className }: { className?: string }) {
       />
       <input
         type="text"
-        placeholder="Search Cognoras..."
+        placeholder="Search articles..."
         value={searchQuery}
         onChange={handleSearchChange}
         className={className}
@@ -123,6 +123,18 @@ export default function Header() {
               </Suspense>
             </div>
 
+            <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-1 shrink-0">
+              <Link href="/" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                Articles
+              </Link>
+              <Link href="/about" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                About
+              </Link>
+              <Link href="/faq" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                FAQ
+              </Link>
+            </nav>
+
             {/* RIGHT — Actions */}
             <div className="flex items-center gap-2">
               {/* Theme toggle */}
@@ -130,6 +142,7 @@ export default function Header() {
                 onClick={toggleTheme}
                 className="p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
                 title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 <Icon
                   name={theme === "dark" ? "Sun" : "Moon"}
@@ -164,6 +177,8 @@ export default function Header() {
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+                aria-label="Open navigation menu"
+                aria-expanded={isMobileMenuOpen}
               >
                 <Icon
                   name={isMobileMenuOpen ? "X" : "Menu"}
@@ -205,7 +220,7 @@ export default function Header() {
           {/* Mobile nav links */}
           <nav className="flex flex-col gap-1 mb-6">
             <Link
-              href="/?view=home"
+              href="/"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
             >
@@ -213,20 +228,20 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/?view=profile"
+              href="/about"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
             >
               <Icon name="User" size={20} />
-              Profile
+              About Cognora
             </Link>
             <Link
-              href="/?view=articles"
+              href="/faq"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted font-medium transition-all"
             >
               <Icon name="Layout" size={20} />
-              Your Stories
+              Help & FAQ
             </Link>
             {isAuthenticated ? (
               <Link

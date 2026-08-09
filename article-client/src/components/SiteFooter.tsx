@@ -5,7 +5,7 @@ const footerGroups = [
     title: "Explore",
     links: [
       { href: "/", label: "Latest articles" },
-      { href: "/?view=home", label: "Featured articles" },
+      { href: "/#featured-articles", label: "Featured articles" },
       { href: "/write", label: "Write on Cognora" },
     ],
   },
