@@ -49,6 +49,28 @@ export default function RichTextEditor({
     editorRef.current?.focus();
   };
 
+  const insertCodeBlock = () => {
+    const languageInput = prompt("Language label (for example: JavaScript):", "JavaScript");
+    if (languageInput === null) return;
+
+    const code = prompt("Paste the code for this block:");
+    if (!code) return;
+
+    const language = languageInput.trim().replace(/[^a-z0-9+#.-]/gi, "").slice(0, 24) || "code";
+    const escapedCode = code
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+    execCommand(
+      "insertHTML",
+      `<pre data-language="${language}"><code class="language-${language.toLowerCase()}">${escapedCode}</code></pre><p><br></p>`
+    );
+    handleInput();
+  };
+
   return (
     <div className="relative group">
       {/* Floating Toolbar */}
@@ -164,6 +186,16 @@ export default function RichTextEditor({
           title="Bullet List"
         >
           <Icon name="List" size={18} />
+        </button>
+        <div className="w-px h-6 bg-border mx-1"></div>
+        <button
+          type="button"
+          onClick={insertCodeBlock}
+          className="p-2 hover:bg-muted rounded-lg transition-colors text-foreground"
+          title="Insert Code Block"
+          aria-label="Insert code block"
+        >
+          <Icon name="Code2" size={18} />
         </button>
       </div>
 

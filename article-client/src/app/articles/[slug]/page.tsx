@@ -15,6 +15,7 @@ import Icon from "@/components/Icons";
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site";
 import { isArticleIndexable } from "@/lib/articleQuality";
+import ArticleContent from "@/components/ArticleContent";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -306,10 +307,7 @@ export default async function Page({ params }: PageProps) {
               )}
 
               {/* Main Content */}
-              <div
-                className="prose dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              <ArticleContent html={article.content} />
 
               {/* Tags */}
               <div className="mt-16 flex flex-wrap gap-2 pb-10 border-b border-border/50">
