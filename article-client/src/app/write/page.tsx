@@ -96,6 +96,17 @@ function WritePageContent() {
       return;
     }
 
+    const supportedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!supportedTypes.includes(file.type)) {
+      toast.error("Please use a JPG, PNG, GIF, or WebP image");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be 5 MB or smaller");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("image", file);
 

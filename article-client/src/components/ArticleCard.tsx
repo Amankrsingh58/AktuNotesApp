@@ -70,6 +70,10 @@ export default function ArticleCard({ article, currentUserId, index = 0 }: Artic
               className="w-5 h-5 rounded-full object-cover"
               loading={loadingType}
               decoding="async"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = "/mainlogo2.png";
+              }}
             />
             <span className="text-[13px] font-medium text-foreground">
               {article.author?.name}
