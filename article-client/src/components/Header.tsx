@@ -93,14 +93,14 @@ export default function Header() {
             {/* LEFT — Logo + Brand */}
             <Link href="/" className="flex items-center gap-3 no-underline shrink-0">
               <div className="h-10 w-10 overflow-hidden rounded-lg border border-border/20 bg-muted">
-                <img
+                {/* <img
                   src="/mainlogo.jpeg"
                   alt="Cognoras logo"
                   width={40}
                   height={40}
                   decoding="async"
                   className="h-full w-full object-cover"
-                />
+                /> */}
               </div>
               <img
                 src={theme === "dark" ? "/newlightlogo.png" : "/newdarklogo.png"}

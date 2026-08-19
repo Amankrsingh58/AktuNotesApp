@@ -412,6 +412,10 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                                   <Icon name="MessageCircle" size={14} />
                                   {art.comments?.length || 0}
                                 </span>
+                                <span className="flex items-center gap-1" title="Views">
+                                  <Icon name="Eye" size={14} />
+                                  {(art.views || 0).toLocaleString()}
+                                </span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <button

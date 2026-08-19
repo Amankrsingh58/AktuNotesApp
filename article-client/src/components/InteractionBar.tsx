@@ -11,6 +11,7 @@ interface InteractionBarProps {
   articleSlug: string;
   initialLikes: string[];
   commentsCount: number;
+  viewsCount: number;
 }
 
 export default function InteractionBar({
@@ -18,6 +19,7 @@ export default function InteractionBar({
   articleSlug,
   initialLikes,
   commentsCount,
+  viewsCount,
 }: InteractionBarProps) {
   const { user, isAuthenticated, setAuthModalOpen, setAuthModalView } = useAuth();
   const [likes, setLikes] = useState<string[]>(initialLikes);
@@ -107,6 +109,14 @@ export default function InteractionBar({
           <Icon name="MessageCircle" size={20} />
           <span className="text-sm">{commentsCount}</span>
         </button>
+        <span
+          className="flex items-center gap-1"
+          title={`${viewsCount.toLocaleString()} views`}
+          aria-label={`${viewsCount.toLocaleString()} views`}
+        >
+          <Icon name="Eye" size={20} />
+          <span className="text-sm">{viewsCount.toLocaleString()}</span>
+        </span>
       </div>
 
       <div className="flex items-center gap-4">

@@ -276,6 +276,7 @@ export default async function Page({ params }: PageProps) {
                 articleSlug={article.slug}
                 initialLikes={article.likes || []}
                 commentsCount={article.comments?.length || 0}
+                viewsCount={article.views || 0}
               />
 
               {/* Cover Image */}

@@ -120,6 +120,13 @@ export default function ArticleCard({ article, currentUserId, index = 0 }: Artic
                 <Icon name="MessageCircle" size={14} />
                 {article.comments?.length || 0}
               </span>
+              <span
+                className="flex items-center gap-1 text-[13px] text-muted-foreground"
+                title={`${(article.views || 0).toLocaleString()} views`}
+              >
+                <Icon name="Eye" size={14} />
+                {(article.views || 0).toLocaleString()}
+              </span>
             </div>
 
             <div className="flex items-center gap-3">
