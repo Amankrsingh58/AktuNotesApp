@@ -103,7 +103,7 @@ export default function Header() {
                 />
               </div>
               <img
-                src={theme === "dark" ? "/lightlogo3.png" : "/darklogo.png"}
+                src={theme === "dark" ? "/newlightlogo.png" : "/newdarklogo.png"}
                 alt="Cognoras"
                 width={160}
                 height={40}
