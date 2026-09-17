@@ -13,10 +13,10 @@ export const api = axios.create({
 });
 
 // ✅ SSR fetch — with revalidation instead of no-store
-export const getArticles = async (): Promise<Article[]> => {
+export const getArticles = async (fresh = false): Promise<Article[]> => {
   try {
     const res = await fetch(`${getApiBaseUrl()}/articles`, {
-      next: { revalidate: 60 }, // ✅ Cache for 60s, not no-store
+      ...(fresh ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
     if (!res.ok) throw new Error("Failed to fetch articles");
     const data = await res.json();
@@ -29,7 +29,8 @@ export const getArticles = async (): Promise<Article[]> => {
 
 export const getArticleBySlug = async (
   slug: string,
-  cookieHeader?: string
+  cookieHeader?: string,
+  fresh = false
 ): Promise<Article | null> => {
   try {
     const headers: Record<string, string> = {};
@@ -37,7 +38,7 @@ export const getArticleBySlug = async (
 
     const res = await fetch(`${getApiBaseUrl()}/articles/${slug}`, {
       headers,
-      next: { revalidate: 60 }, // ✅ Cache individual articles too
+      ...(fresh ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
 
     if (!res.ok) {

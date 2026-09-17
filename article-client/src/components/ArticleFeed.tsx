@@ -30,7 +30,8 @@ export default function ArticleFeed({ initialArticles, isLoading = false }: Arti
       );
     } else if (feedTab === "top") {
       baseArticles = baseArticles.sort(
-        (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
+        (a, b) => (b.views || 0) - (a.views || 0) ||
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     }
 

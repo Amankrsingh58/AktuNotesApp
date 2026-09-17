@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const articles = (await getArticles()).filter(
+  const articles = (await getArticles(true)).filter(
     (article) => article.status === "published" && isArticleIndexable(article)
   );
 

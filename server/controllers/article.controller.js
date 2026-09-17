@@ -185,11 +185,18 @@ exports.updateArticle = async (req, res) => {
 // Update Article Profile
 exports.updateArticleProfile = async (req, res) => {
     try {
-        const { bio, socialLinks, avatar } = req.body;
+        const { name, bio, socialLinks, avatar } = req.body;
         
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
+        }
+
+        if (name !== undefined) {
+            if (typeof name !== "string" || !name.trim() || name.trim().length > 80) {
+                return res.status(400).json({ message: "Author name must be between 1 and 80 characters" });
+            }
+            user.name = name.trim();
         }
 
         user.articleProfile = {

@@ -24,7 +24,7 @@ interface PageProps {
 // Generate Dynamic Meta Tags for SEO Optimization
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug, undefined, true);
 
   if (!article) {
     return {
@@ -86,7 +86,7 @@ export default async function Page({ params }: PageProps) {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  const article = await getArticleBySlug(slug, cookieHeader);
+  const article = await getArticleBySlug(slug, cookieHeader, true);
 
   if (!article) {
     notFound();

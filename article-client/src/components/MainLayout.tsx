@@ -38,6 +38,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
   const hasFetchedArticles = useRef(false); // ✅ Persists across re-renders
 
   const [profileForm, setProfileForm] = useState({
+    name: "",
     bio: "",
     website: "",
     twitter: "",
@@ -49,11 +50,14 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
   useEffect(() => {
     if (user?.articleProfile) {
       setProfileForm({
+        name: user.name || "",
         bio: user.articleProfile.bio || "",
         website: user.articleProfile.socialLinks?.website || "",
         twitter: user.articleProfile.socialLinks?.twitter || "",
         linkedin: user.articleProfile.socialLinks?.linkedin || "",
       });
+    } else if (user) {
+      setProfileForm((previous) => ({ ...previous, name: user.name || "" }));
     }
   }, [user]);
 
@@ -88,9 +92,14 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!profileForm.name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
     setUpdatingProfile(true);
     try {
       const updatedUser = await updateProfile({
+        name: profileForm.name.trim(),
         bio: profileForm.bio,
         socialLinks: {
           website: profileForm.website,
@@ -99,6 +108,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
         },
       });
       if (updatedUser?.user) login(updatedUser.user);
+      router.refresh();
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update profile");
@@ -201,6 +211,23 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                   </div>
 
                   <form onSubmit={handleProfileSubmit} className="space-y-6">
+                    <div>
+                      <label htmlFor="author-name" className="block text-sm font-semibold text-foreground mb-2">
+                        Author name
+                      </label>
+                      <input
+                        id="author-name"
+                        type="text"
+                        maxLength={80}
+                        required
+                        value={profileForm.name}
+                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                        className="w-full bg-background border border-input rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        This name appears on your published articles.
+                      </p>
+                    </div>
                     <div>
                       <label className="block text-sm font-semibold text-foreground mb-2">
                         Bio / About You
