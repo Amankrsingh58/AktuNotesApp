@@ -11,13 +11,25 @@ import { isArticleIndexable } from "@/lib/articleQuality";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+const homeMetadata: Metadata = {
   title: "Cognora | Articles, Technologies & AI Insights Feed",
   description: "Browse the latest tech articles on AI, software engineering, and modern technologies. Join the community and share your insights on Cognora.",
   alternates: {
     canonical: "/",
   },
 };
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}): Promise<Metadata> {
+  const { q } = await searchParams;
+
+  return q !== undefined
+    ? { ...homeMetadata, robots: { index: false, follow: true } }
+    : homeMetadata;
+}
 
 export default async function Page() {
   const articles = (await getArticles(true)).filter(

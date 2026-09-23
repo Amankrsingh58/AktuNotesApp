@@ -195,14 +195,14 @@ body {
 }
 
 .prose p {
-  margin-bottom: 1.6em;
+  margin-bottom: 0.8em;
   margin-top: 0;
 }
 
 .prose br {
-  content: "";
-  display: block;
-  margin-bottom: 0.75em;
+  content: normal;
+  display: inline;
+  margin: 0;
 }
 
 .prose h1 {
