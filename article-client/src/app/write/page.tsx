@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Icon from "@/components/Icons";
 import RichTextEditor from "@/components/RichTextEditor";
+import ArticleContent from "@/components/ArticleContent";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { getArticleQualityIssue } from "@/lib/articleQuality";
@@ -218,10 +219,7 @@ function WritePageContent() {
             className="w-full h-auto object-cover rounded-lg mb-10 shadow"
           />
         )}
-        <div
-          className="prose prose-lg dark:prose-invert font-serif"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <ArticleContent html={content} />
         <div className="mt-10 flex gap-2">
           {tags
             .split(",")

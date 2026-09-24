@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import renderMathInElement from "katex/contrib/auto-render";
 
 export default function ArticleContent({ html }: { html: string }) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,18 @@ export default function ArticleContent({ html }: { html: string }) {
 
     const codeBlocks = content.querySelectorAll<HTMLPreElement>("pre");
     const cleanups: Array<() => void> = [];
+
+    renderMathInElement(content, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "$", right: "$", display: false },
+      ],
+      throwOnError: false,
+      strict: false,
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    });
 
     codeBlocks.forEach((block) => {
       if (block.querySelector(":scope > .article-code-copy")) return;

@@ -410,6 +410,18 @@ body {
   margin: 2.5em 0;
 }
 
+.prose .katex-display {
+  max-width: 100%;
+  margin: 0.9em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.15em 0;
+}
+
+.prose .katex {
+  font-size: 1.05em;
+}
+
 /* Hide scrollbar */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
