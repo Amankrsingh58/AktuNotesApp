@@ -422,6 +422,22 @@ body {
   font-size: 1.05em;
 }
 
+.article-editor-math {
+  display: block;
+  max-width: 100%;
+  margin: 0.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+  text-align: center;
+  cursor: text;
+}
+
+.article-editor-math:hover {
+  background: rgb(var(--color-muted) / 0.35);
+  border-radius: 0.4rem;
+}
+
 /* Hide scrollbar */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

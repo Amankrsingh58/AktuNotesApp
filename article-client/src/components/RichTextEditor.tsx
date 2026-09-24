@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import katex from "katex";
 import Icon from "./Icons";
 import { cn } from "@/lib/utils";
 
@@ -21,12 +22,74 @@ export default function RichTextEditor({
   const [codeLanguage, setCodeLanguage] = useState("JavaScript");
   const [codeValue, setCodeValue] = useState("");
 
+  const renderEditorMath = (editor: HTMLDivElement) => {
+    const selection = window.getSelection();
+    const selectedNode = selection?.anchorNode;
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    const textNodes: Text[] = [];
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode as Text;
+      const parent = node.parentElement;
+      if (!parent?.closest("pre, code, .article-editor-math") && /\$\$[\s\S]+?\$\$/.test(node.data)) {
+        textNodes.push(node);
+      }
+    }
+
+    textNodes.forEach((node) => {
+      const fragment = document.createDocumentFragment();
+      const pattern = /\$\$([\s\S]+?)\$\$/g;
+      let cursor = 0;
+      let match: RegExpExecArray | null;
+      let caretTarget: HTMLElement | null = null;
+
+      while ((match = pattern.exec(node.data)) !== null) {
+        fragment.append(document.createTextNode(node.data.slice(cursor, match.index)));
+        const math = document.createElement("span");
+        math.className = "article-editor-math";
+        math.contentEditable = "false";
+        math.dataset.latex = match[1].trim();
+        math.dataset.display = "true";
+        math.title = "Double-click to edit this equation";
+        katex.render(math.dataset.latex, math, {
+          displayMode: true,
+          throwOnError: false,
+          strict: false,
+        });
+        fragment.append(math);
+        if (selectedNode === node) caretTarget = math;
+        cursor = pattern.lastIndex;
+      }
+
+      fragment.append(document.createTextNode(node.data.slice(cursor)));
+      node.replaceWith(fragment);
+
+      if (caretTarget && selection) {
+        const range = document.createRange();
+        range.setStartAfter(caretTarget);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    });
+  };
+
+  const getSourceHtml = (editor: HTMLDivElement) => {
+    const clone = editor.cloneNode(true) as HTMLDivElement;
+    clone.querySelectorAll<HTMLElement>(".article-editor-math").forEach((math) => {
+      const source = math.dataset.latex || "";
+      math.replaceWith(document.createTextNode(`$$ ${source} $$`));
+    });
+    return clone.innerHTML;
+  };
+
   // Sync editor content with external value
   useEffect(() => {
     if (editorRef.current) {
       if (value !== editorRef.current.innerHTML) {
         if (document.activeElement !== editorRef.current) {
           editorRef.current.innerHTML = value || "";
+          renderEditorMath(editorRef.current);
         }
       }
     }
@@ -44,7 +107,8 @@ export default function RichTextEditor({
 
   const handleInput = () => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      renderEditorMath(editorRef.current);
+      onChange(getSourceHtml(editorRef.current));
     }
   };
 
@@ -258,6 +322,20 @@ export default function RichTextEditor({
         ref={editorRef}
         contentEditable
         onInput={handleInput}
+        onDoubleClick={(event) => {
+          const target = event.target as HTMLElement;
+          const math = target.closest<HTMLElement>(".article-editor-math");
+          if (!math) return;
+
+          const source = document.createTextNode(`$$ ${math.dataset.latex || ""} $$`);
+          math.replaceWith(source);
+          const selection = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(source);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          if (editorRef.current) onChange(getSourceHtml(editorRef.current));
+        }}
         onKeyUp={(event) => {
           if (event.key === "Enter") resetNewLineColor();
         }}
