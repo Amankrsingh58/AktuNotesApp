@@ -30,7 +30,7 @@ export default function ArticleContent({ html }: { html: string }) {
 
       const code = block.querySelector("code");
       const classLanguage = code?.className.match(/language-([\w+#.-]+)/i)?.[1];
-      if (!block.dataset.language) {
+      if (!block.hasAttribute("data-language")) {
         block.dataset.language = classLanguage || "code";
       }
 

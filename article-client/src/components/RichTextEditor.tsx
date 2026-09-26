@@ -143,7 +143,7 @@ export default function RichTextEditor({
   const insertCodeBlock = () => {
     if (!codeValue.trim()) return;
 
-    const language = codeLanguage.trim().replace(/[^a-z0-9+#.-]/gi, "").slice(0, 24) || "code";
+    const language = codeLanguage.trim().replace(/[^a-z0-9+#.-]/gi, "").slice(0, 24);
     const escapedCode = codeValue
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -157,7 +157,8 @@ export default function RichTextEditor({
       selection.addRange(savedSelectionRef.current);
     }
 
-    execCommand("insertHTML", `<pre data-language="${language}"><code class="language-${language.toLowerCase()}">${escapedCode}</code></pre><p><br></p>`);
+    const languageClass = language ? ` class="language-${language.toLowerCase()}"` : "";
+    execCommand("insertHTML", `<pre data-language="${language}"><code${languageClass}>${escapedCode}</code></pre><p><br></p>`);
     handleInput();
     closeCodeModal();
   };
@@ -368,7 +369,7 @@ export default function RichTextEditor({
 
             <div className="space-y-4 p-5 sm:p-6">
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-foreground">Language</span>
+                <span className="mb-2 block text-sm font-semibold text-foreground">Language <span className="font-normal text-muted-foreground">(optional)</span></span>
                 <input
                   list="code-language-options"
                   value={codeLanguage}
