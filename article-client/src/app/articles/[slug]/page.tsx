@@ -16,6 +16,7 @@ import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site";
 import { isArticleIndexable } from "@/lib/articleQuality";
 import ArticleContent from "@/components/ArticleContent";
+import ArticleAnalytics from "@/components/ArticleAnalytics";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -176,6 +177,7 @@ export default async function Page({ params }: PageProps) {
       <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
         <AuthModal />
         <Header />
+        <ArticleAnalytics articleId={article._id} slug={article.slug} />
         <div className="flex pt-14">
           <Sidebar />
           <main className="flex-1 min-w-0">

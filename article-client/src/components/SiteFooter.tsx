@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import PrivacyChoicesButton from "./PrivacyChoicesButton";
 
 const footerGroups = [
   {
@@ -36,6 +40,8 @@ const footerGroups = [
 ];
 
 export default function SiteFooter() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) return null;
   return (
     <footer className="border-t border-border/60 bg-card" role="contentinfo">
       <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1.2fr_2fr]">
@@ -67,6 +73,7 @@ export default function SiteFooter() {
       </div>
       <div className="border-t border-border/60 px-5 py-5 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} Cognora. All rights reserved.
+        <PrivacyChoicesButton />
       </div>
     </footer>
   );

@@ -52,6 +52,7 @@ export interface Article {
     articleProfile?: ArticleProfile;
   };
   tags?: string[];
+  category?: string;
   likes?: string[];
   comments?: Comment[];
   seoTitle?: string;

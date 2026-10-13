@@ -84,6 +84,10 @@ app.use("/api/payment", paymentRoutes);
 const articleRoutes = require("./routes/article.routes");
 app.use("/api/articles", articleRoutes);
 
+// Privacy-conscious Cognora analytics and reporting
+const analyticsRoutes = require("./routes/analytics.routes");
+app.use("/api/cognora-analytics", analyticsRoutes);
+
 // Article User Auth routes
 const articleUserRoutes = require("./routes/articleUser.routes");
 app.use("/api/article-user", articleUserRoutes);

@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import SiteFooter from "@/components/SiteFooter";
 import AdSenseScript from "@/components/AdSenseScript";
+import AnalyticsConsent from "@/components/AnalyticsConsent";
 import { getSiteUrl } from "@/lib/site";
 
 const inter = Inter({
@@ -103,6 +104,7 @@ export default function RootLayout({
             <Toaster position="top-center" />
             {children}
             <SiteFooter />
+            <AnalyticsConsent />
           </AuthProvider>
         </ThemeProvider>
       </body>

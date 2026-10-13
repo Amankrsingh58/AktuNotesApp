@@ -31,6 +31,12 @@ const ArticleSchema = new mongoose.Schema({
     tags: [{ 
         type: String 
     }],
+    category: {
+        type: String,
+        trim: true,
+        default: "Uncategorized",
+        index: true
+    },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "ArticleUser"

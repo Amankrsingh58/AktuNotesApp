@@ -44,12 +44,6 @@ exports.getArticleBySlug = async (req, res) => {
             }
         }
 
-        // Increment views only for published articles
-        if (article.status === "published") {
-            article.views += 1;
-            await article.save();
-        }
-
         res.status(200).json(article);
     } catch (error) {
         res.status(500).json({ message: "Error fetching article", error: error.message });
@@ -90,7 +84,7 @@ const getPublishedArticleQualityIssue = ({ title, summary, content }) => {
 // Create article
 exports.createArticle = async (req, res) => {
     try {
-        const { title, content, summary, coverImage, tags, status } = req.body;
+        const { title, content, summary, coverImage, tags, category, status } = req.body;
 
         if (!title || !content || !summary) {
             return res.status(400).json({ message: "Title, content and summary are required" });
@@ -118,6 +112,7 @@ exports.createArticle = async (req, res) => {
             coverImage: coverImage || "",
             author: req.user.id,
             tags: tags || [],
+            category: typeof category === "string" && category.trim() ? category.trim() : "Uncategorized",
             status: status || "published",
             readTime: calculateReadTime(content)
         });
@@ -137,7 +132,7 @@ exports.createArticle = async (req, res) => {
 // Update article
 exports.updateArticle = async (req, res) => {
     try {
-        const { title, content, summary, coverImage, tags, status } = req.body;
+        const { title, content, summary, coverImage, tags, category, status } = req.body;
         const article = await Article.findById(req.params.id);
 
         if (!article) {
@@ -173,6 +168,7 @@ exports.updateArticle = async (req, res) => {
         if (summary) article.summary = summary;
         if (coverImage) article.coverImage = coverImage;
         if (tags) article.tags = tags;
+        if (category !== undefined) article.category = typeof category === "string" && category.trim() ? category.trim() : "Uncategorized";
         if (status) article.status = status;
 
         await article.save();

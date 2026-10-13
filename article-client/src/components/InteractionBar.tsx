@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import Icon from "./Icons";
 import toast from "react-hot-toast";
+import { trackArticleEvent } from "@/lib/analytics";
 
 interface InteractionBarProps {
   articleId: string;
@@ -77,6 +78,7 @@ export default function InteractionBar({
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      void trackArticleEvent("share", articleId, articleSlug);
       toast.success("Link copied to clipboard!");
     } catch (err) {
       toast.error("Failed to copy link");

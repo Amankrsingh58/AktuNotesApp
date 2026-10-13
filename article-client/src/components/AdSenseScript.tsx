@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const excludedRoutes = ["/login", "/signup", "/write", "/linksin"];
+const excludedRoutes = ["/login", "/signup", "/write", "/linksin", "/admin"];
 
 export default function AdSenseScript() {
   const pathname = usePathname();
