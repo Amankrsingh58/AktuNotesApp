@@ -10,6 +10,7 @@ import ArticleContent from "@/components/ArticleContent";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { getArticleQualityIssue } from "@/lib/articleQuality";
+import CategorySelect from "@/components/CategorySelect";
 
 function WritePageContent() {
   const router = useRouter();
@@ -26,6 +27,7 @@ function WritePageContent() {
   const [content, setContent] = useState("");
   const [summary, setSummary] = useState("");
   const [tags, setTags] = useState("");
+  const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
@@ -69,6 +71,7 @@ function WritePageContent() {
         setContent(art.content);
         setSummary(art.summary);
         setTags(art.tags?.join(", ") || "");
+        setCategory(art.category === "Uncategorized" ? "" : art.category || "");
         setCoverImage(art.coverImage || "");
       } catch (err) {
         toast.error("Failed to load article for editing");
@@ -158,6 +161,7 @@ function WritePageContent() {
           .split(",")
           .map((tag) => tag.trim())
           .filter((tag) => tag !== ""),
+        category: category.trim() || "Uncategorized",
         status,
       };
 
@@ -221,6 +225,7 @@ function WritePageContent() {
         )}
         <ArticleContent html={content} />
         <div className="mt-10 flex gap-2">
+          {category.trim() && <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-semibold">{category.trim()}</span>}
           {tags
             .split(",")
             .map((t) => t.trim())
@@ -301,7 +306,7 @@ function WritePageContent() {
       />
 
       <div className="space-y-4 mb-12 p-6 bg-muted/30 rounded-2xl border border-border">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="flex-1">
             <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
               Cover Image
@@ -342,6 +347,13 @@ function WritePageContent() {
               value={tags}
               onChange={(e) => setTags(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+              Category
+            </label>
+            <CategorySelect value={category} onChange={setCategory} />
+            <p className="mt-1.5 text-xs text-muted-foreground">Choose the closest topic or select Other to use your own.</p>
           </div>
         </div>
       </div>

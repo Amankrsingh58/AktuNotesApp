@@ -9,7 +9,7 @@ export default function HomeContent({ articles }: { articles: Article[] }) {
   const latest = [...published]
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .slice(0, 4);
-  const categories = Array.from(new Set(published.flatMap((article) => article.tags || []))).slice(0, 8);
+  const categories = Array.from(new Set(published.map((article) => article.category).filter((category): category is string => Boolean(category && category !== "Uncategorized")))).slice(0, 8);
 
   return (
     <div className="mt-20 space-y-20 border-t border-border/60 pt-16">
@@ -47,7 +47,7 @@ export default function HomeContent({ articles }: { articles: Article[] }) {
           <h2 id="categories" className="text-3xl font-bold">Explore topics</h2>
           <p className="mt-2 text-muted-foreground">Find focused writing in the areas that matter to you.</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            {categories.map((category) => <Link key={category} href={`/?q=${encodeURIComponent(category)}`} className="rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium hover:border-primary hover:text-primary">{category}</Link>)}
+            {categories.map((category) => <Link key={category} href={`/?category=${encodeURIComponent(category)}`} className="rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium hover:border-primary hover:text-primary">{category}</Link>)}
           </div>
         </section>
       )}

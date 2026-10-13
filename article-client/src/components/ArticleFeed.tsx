@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Article } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
 import ArticleCard from "./ArticleCard";
@@ -14,9 +14,13 @@ interface ArticleFeedProps {
 }
 
 export default function ArticleFeed({ initialArticles, isLoading = false }: ArticleFeedProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
+  const selectedCategory = searchParams.get("category") || "";
+  const categories = useMemo(() => Array.from(new Set(initialArticles.map(article => article.category).filter((category): category is string => Boolean(category && category !== "Uncategorized")))).sort(), [initialArticles]);
 
   const [feedTab, setFeedTab] = useState<"for-you" | "following" | "top">("for-you");
 
@@ -35,6 +39,10 @@ export default function ArticleFeed({ initialArticles, isLoading = false }: Arti
       );
     }
 
+    if (selectedCategory) {
+      baseArticles = baseArticles.filter(article => article.category?.toLowerCase() === selectedCategory.toLowerCase());
+    }
+
     // Filter by Search Query
     if (!searchQuery) return baseArticles;
 
@@ -43,12 +51,27 @@ export default function ArticleFeed({ initialArticles, isLoading = false }: Arti
       (art) =>
         art.title.toLowerCase().includes(query) ||
         art.summary.toLowerCase().includes(query) ||
+        art.category?.toLowerCase().includes(query) ||
         art.tags?.some((tag) => tag.toLowerCase().includes(query))
     );
-  }, [initialArticles, searchQuery, feedTab, user]);
+  }, [initialArticles, searchQuery, selectedCategory, feedTab, user]);
+
+  const changeCategory = (category: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category) params.set("category", category); else params.delete("category");
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
 
   return (
     <div className="flex-1 min-w-0 lg:max-w-[720px]">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <label htmlFor="article-category-filter" className="text-sm font-semibold text-foreground">Browse by category</label>
+        <select id="article-category-filter" value={selectedCategory} onChange={(event) => changeCategory(event.target.value)} className="h-10 max-w-[65%] rounded-xl border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-primary">
+          <option value="">All categories</option>
+          {categories.map(category => <option key={category} value={category}>{category}</option>)}
+        </select>
+      </div>
       {/* Tabs */}
       <div className="flex items-center gap-8 border-b border-border mb-8 overflow-x-auto scrollbar-hide">
         <button

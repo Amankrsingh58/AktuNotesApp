@@ -34,6 +34,7 @@ const ArticleSchema = new mongoose.Schema({
     category: {
         type: String,
         trim: true,
+        maxlength: 80,
         default: "Uncategorized",
         index: true
     },

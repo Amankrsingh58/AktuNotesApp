@@ -112,7 +112,7 @@ exports.createArticle = async (req, res) => {
             coverImage: coverImage || "",
             author: req.user.id,
             tags: tags || [],
-            category: typeof category === "string" && category.trim() ? category.trim() : "Uncategorized",
+            category: typeof category === "string" && category.trim() ? category.trim().slice(0, 80) : "Uncategorized",
             status: status || "published",
             readTime: calculateReadTime(content)
         });
@@ -168,7 +168,7 @@ exports.updateArticle = async (req, res) => {
         if (summary) article.summary = summary;
         if (coverImage) article.coverImage = coverImage;
         if (tags) article.tags = tags;
-        if (category !== undefined) article.category = typeof category === "string" && category.trim() ? category.trim() : "Uncategorized";
+        if (category !== undefined) article.category = typeof category === "string" && category.trim() ? category.trim().slice(0, 80) : "Uncategorized";
         if (status) article.status = status;
 
         await article.save();
