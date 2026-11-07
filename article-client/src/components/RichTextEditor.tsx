@@ -22,6 +22,14 @@ export default function RichTextEditor({
   const [codeLanguage, setCodeLanguage] = useState("JavaScript");
   const [codeValue, setCodeValue] = useState("");
 
+  // Table modal state
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(2);
+  const [tableCells, setTableCells] = useState<string[][]>(() =>
+    Array.from({ length: 4 }, () => Array.from({ length: 2 }, () => ""))
+  );
+
   const renderEditorMath = (editor: HTMLDivElement) => {
     const selection = window.getSelection();
     const selectedNode = selection?.anchorNode;
@@ -161,6 +169,89 @@ export default function RichTextEditor({
     execCommand("insertHTML", `<pre data-language="${language}"><code${languageClass}>${escapedCode}</code></pre><p><br></p>`);
     handleInput();
     closeCodeModal();
+  };
+
+  // ── Table helpers ──────────────────────────────────────────
+  const resetTableGrid = (rows: number, cols: number) => {
+    // +1 because row 0 is the header
+    setTableCells(
+      Array.from({ length: rows + 1 }, () =>
+        Array.from({ length: cols }, () => "")
+      )
+    );
+  };
+
+  const openTableModal = () => {
+    const selection = window.getSelection();
+    if (selection?.rangeCount && editorRef.current?.contains(selection.anchorNode)) {
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+    const r = 3;
+    const c = 2;
+    setTableRows(r);
+    setTableCols(c);
+    resetTableGrid(r, c);
+    setIsTableModalOpen(true);
+  };
+
+  const closeTableModal = () => {
+    setIsTableModalOpen(false);
+  };
+
+  const updateTableCell = (row: number, col: number, value: string) => {
+    setTableCells((prev) => {
+      const next = prev.map((r) => [...r]);
+      next[row][col] = value;
+      return next;
+    });
+  };
+
+  const changeTableDimensions = (newRows: number, newCols: number) => {
+    setTableRows(newRows);
+    setTableCols(newCols);
+    setTableCells((prev) => {
+      const totalRows = newRows + 1; // +1 for header
+      return Array.from({ length: totalRows }, (_, r) =>
+        Array.from({ length: newCols }, (_, c) => prev[r]?.[c] ?? "")
+      );
+    });
+  };
+
+  const insertTable = () => {
+    const esc = (s: string) =>
+      s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+    // Build header
+    const headerCells = tableCells[0]
+      .map((cell) => `<th>${esc(cell) || "&nbsp;"}</th>`)
+      .join("");
+    const thead = `<thead><tr>${headerCells}</tr></thead>`;
+
+    // Build body
+    const bodyRows = tableCells
+      .slice(1)
+      .map((row) => {
+        const cells = row.map((cell) => `<td>${esc(cell) || "&nbsp;"}</td>`).join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+    const tbody = `<tbody>${bodyRows}</tbody>`;
+
+    const tableHtml = `<table>${thead}${tbody}</table><p><br></p>`;
+
+    const selection = window.getSelection();
+    if (selection && savedSelectionRef.current) {
+      selection.removeAllRanges();
+      selection.addRange(savedSelectionRef.current);
+    }
+
+    execCommand("insertHTML", tableHtml);
+    handleInput();
+    closeTableModal();
   };
 
   const resetNewLineColor = () => {
@@ -316,6 +407,15 @@ export default function RichTextEditor({
           aria-label="Insert code block"
         >
           <Icon name="Code2" size={18} />
+        </button>
+        <button
+          type="button"
+          onClick={openTableModal}
+          className="p-2 hover:bg-muted rounded-lg transition-colors text-foreground"
+          title="Insert Table"
+          aria-label="Insert table"
+        >
+          <Icon name="Table" size={18} />
         </button>
       </div>
 
