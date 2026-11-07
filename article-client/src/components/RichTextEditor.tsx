@@ -104,14 +104,17 @@ export default function RichTextEditor({
   }, [value]);
 
   useEffect(() => {
-    if (!isCodeModalOpen) return;
+    if (!isCodeModalOpen && !isTableModalOpen) return;
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsCodeModalOpen(false);
+      if (event.key === "Escape") {
+        setIsCodeModalOpen(false);
+        setIsTableModalOpen(false);
+      }
     };
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [isCodeModalOpen]);
+  }, [isCodeModalOpen, isTableModalOpen]);
 
   const handleInput = () => {
     if (editorRef.current) {
@@ -437,6 +440,18 @@ export default function RichTextEditor({
           selection?.addRange(range);
           if (editorRef.current) onChange(getSourceHtml(editorRef.current));
         }}
+        onKeyDown={(event) => {
+          // Prevent Enter from breaking table cells into new block elements
+          if (event.key === "Enter") {
+            const target = event.target as HTMLElement;
+            const anchor = window.getSelection()?.anchorNode;
+            const cell = (anchor?.nodeType === Node.ELEMENT_NODE ? anchor as Element : anchor?.parentElement)?.closest("td, th");
+            if (cell && editorRef.current?.contains(cell)) {
+              event.preventDefault();
+              document.execCommand("insertLineBreak");
+            }
+          }
+        }}
         onKeyUp={(event) => {
           if (event.key === "Enter") resetNewLineColor();
         }}
@@ -513,6 +528,150 @@ export default function RichTextEditor({
           </section>
         </div>
       )}
+
+      {/* ── Table Modal ─────────────────────────────────────── */}
+      {isTableModalOpen && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeTableModal();
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="table-modal-title"
+            className="w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
+              <div>
+                <h2 id="table-modal-title" className="text-lg font-bold text-foreground">
+                  Insert table
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Set the size, fill in the cells, and insert.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeTableModal}
+                className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Close table dialog"
+              >
+                <Icon name="X" size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="space-y-5 p-5 sm:p-6">
+              {/* Row & column controls */}
+              <div className="flex flex-wrap items-center gap-6">
+                {/* Columns */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-foreground">Columns</span>
+                  <button
+                    type="button"
+                    onClick={() => tableCols > 1 && changeTableDimensions(tableRows, tableCols - 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40"
+                    disabled={tableCols <= 1}
+                  >
+                    <Icon name="Minus" size={14} />
+                  </button>
+                  <span className="w-6 text-center text-sm font-bold text-foreground tabular-nums">{tableCols}</span>
+                  <button
+                    type="button"
+                    onClick={() => tableCols < 8 && changeTableDimensions(tableRows, tableCols + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40"
+                    disabled={tableCols >= 8}
+                  >
+                    <Icon name="Plus" size={14} />
+                  </button>
+                </div>
+                {/* Rows */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-foreground">Rows</span>
+                  <button
+                    type="button"
+                    onClick={() => tableRows > 1 && changeTableDimensions(tableRows - 1, tableCols)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40"
+                    disabled={tableRows <= 1}
+                  >
+                    <Icon name="Minus" size={14} />
+                  </button>
+                  <span className="w-6 text-center text-sm font-bold text-foreground tabular-nums">{tableRows}</span>
+                  <button
+                    type="button"
+                    onClick={() => tableRows < 20 && changeTableDimensions(tableRows + 1, tableCols)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40"
+                    disabled={tableRows >= 20}
+                  >
+                    <Icon name="Plus" size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Editable grid */}
+              <div className="overflow-x-auto rounded-xl border border-border">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-muted/60">
+                      {tableCells[0]?.map((cell, c) => (
+                        <th key={c} className="border-b border-r last:border-r-0 border-border px-3 py-2">
+                          <input
+                            type="text"
+                            value={cell}
+                            onChange={(e) => updateTableCell(0, c, e.target.value)}
+                            placeholder={`Header ${c + 1}`}
+                            className="w-full bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground/50"
+                          />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableCells.slice(1).map((row, r) => (
+                      <tr key={r} className="even:bg-muted/30">
+                        {row.map((cell, c) => (
+                          <td key={c} className="border-b border-r last:border-r-0 border-border px-3 py-2">
+                            <input
+                              type="text"
+                              value={cell}
+                              onChange={(e) => updateTableCell(r + 1, c, e.target.value)}
+                              placeholder="—"
+                              className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/40"
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex flex-col-reverse gap-3 border-t border-border bg-muted/20 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+              <button
+                type="button"
+                onClick={closeTableModal}
+                className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={insertTable}
+                className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              >
+                Insert table
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
 
       <style jsx global>{`
         [contenteditable]:empty:before {

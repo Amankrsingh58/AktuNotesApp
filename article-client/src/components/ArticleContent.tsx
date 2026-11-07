@@ -25,6 +25,23 @@ export default function ArticleContent({ html }: { html: string }) {
       ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
     });
 
+    // Ensure all links in the article open in a new tab securely
+    const links = content.querySelectorAll<HTMLAnchorElement>("a");
+    links.forEach((link) => {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+    });
+
+    const handleLinkClick = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement)?.closest("a");
+      if (anchor && content.contains(anchor)) {
+        anchor.setAttribute("target", "_blank");
+        anchor.setAttribute("rel", "noopener noreferrer");
+      }
+    };
+    content.addEventListener("click", handleLinkClick);
+    cleanups.push(() => content.removeEventListener("click", handleLinkClick));
+
     codeBlocks.forEach((block) => {
       if (block.querySelector(":scope > .article-code-copy")) return;
 
