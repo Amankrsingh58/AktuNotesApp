@@ -25,4 +25,9 @@ router.get("/articles", adminAuth, allowRoles("super_admin"), controller.article
 router.patch("/articles/:id", adminAuth, allowRoles("super_admin"), controller.updateArticle);
 router.delete("/articles/:id", adminAuth, allowRoles("super_admin"), controller.deleteArticle);
 
+// Users management routes
+router.get("/users", adminAuth, allowRoles("super_admin"), controller.users);
+router.get("/users/:id", adminAuth, allowRoles("super_admin"), controller.userDetails);
+router.delete("/users/:id", adminAuth, allowRoles("super_admin"), controller.deleteUser);
+
 module.exports = router;

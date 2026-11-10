@@ -21,6 +21,59 @@ import RichTextEditor from "@/components/RichTextEditor";
 import CategorySelect from "@/components/CategorySelect";
 
 type Row = { name: string; views: number; shares?: number };
+type UserRow = {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  type: "article_user" | "student" | "both";
+  bio?: string;
+  profilePic?: string;
+  articleProfile?: {
+    bio?: string;
+    avatar?: string;
+    socialLinks?: {
+      twitter?: string;
+      linkedin?: string;
+      website?: string;
+    };
+    isComplete?: boolean;
+  };
+  followersCount: number;
+  followingCount: number;
+  createdAt: string;
+  college?: string;
+  year?: number | null;
+  isVerified?: boolean;
+  articlesCount: number;
+  publishedCount: number;
+  totalViews: number;
+  totalEngagement: number;
+};
+type UserDetailsData = {
+  user: UserRow;
+  stats: {
+    articlesCount: number;
+    publishedCount: number;
+    totalViews: number;
+    totalLikes: number;
+    totalComments: number;
+    totalEngagement: number;
+  };
+  articles: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    status: "draft" | "published";
+    category: string;
+    views: number;
+    likesCount: number;
+    commentsCount: number;
+    createdAt: string;
+    updatedAt: string;
+    coverImage?: string;
+  }>;
+};
 type ArticleRow = {
   _id: string;
   title: string;
@@ -98,6 +151,7 @@ const tabs = [
   ["realtime", "Realtime", "Radio"],
   ["history", "Historical", "CalendarRange"],
   ["articles", "Articles", "FileText"],
+  ["users", "Users & details", "Users"],
 ] as const;
 
 const number = (value = 0) =>
@@ -366,10 +420,14 @@ export default function AdminDashboard() {
                 {tabs.find((t) => t[0] === active)?.[1]}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Consented visitors only · raw events retained for 90 days
+                {active === "users"
+                  ? "View registered platform users, author profiles, and engagement details"
+                  : active === "articles"
+                  ? "Review, edit metadata, and moderate articles"
+                  : "Consented visitors only · raw events retained for 90 days"}
               </p>
             </div>
-            {active !== "articles" && (
+            {active !== "articles" && active !== "users" && (
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={range}
@@ -416,7 +474,7 @@ export default function AdminDashboard() {
               </button>
             </div>
           )}
-          {loading && active !== "realtime" && active !== "articles" ? (
+          {loading && active !== "realtime" && active !== "articles" && active !== "users" ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[1, 2, 3, 4].map((x) => (
                 <div
@@ -649,6 +707,7 @@ export default function AdminDashboard() {
                 <HistoryPanel data={historical} series={series} />
               )}
               {active === "articles" && <ArticleManager />}
+              {active === "users" && <UserManager />}
             </>
           )}
         </main>
@@ -1211,6 +1270,590 @@ function ArticleManager() {
                 className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
               >
                 {saving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+function UserManager() {
+  const [users, setUsers] = useState<UserRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [metrics, setMetrics] = useState({ totalUsers: 0, totalAuthors: 0, totalArticles: 0 });
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [detailsData, setDetailsData] = useState<UserDetailsData | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
+
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/cognora-analytics/users", {
+        params: { page, search, role: roleFilter },
+      });
+      setUsers(res.data.items || []);
+      setPages(res.data.pages || 1);
+      if (res.data.metrics) setMetrics(res.data.metrics);
+    } catch (err) {
+      console.error("Failed to load users", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, roleFilter]);
+
+  useEffect(() => {
+    const id = setTimeout(() => void loadUsers(), 250);
+    return () => clearTimeout(id);
+  }, [loadUsers]);
+
+  const openUserDetails = async (userId: string) => {
+    setSelectedUserId(userId);
+    setLoadingDetails(true);
+    setDetailsData(null);
+    try {
+      const res = await api.get(`/cognora-analytics/users/${userId}`);
+      setDetailsData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch user details", err);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const closeUserDetails = () => {
+    setSelectedUserId(null);
+    setDetailsData(null);
+  };
+
+  const removeUser = async (user: UserRow) => {
+    if (!confirm(`Are you sure you want to permanently delete user "${user.name}" (${user.email})? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await api.delete(`/cognora-analytics/users/${user._id}`);
+      setActionMessage(`User "${user.name}" was successfully deleted.`);
+      if (selectedUserId === user._id) closeUserDetails();
+      void loadUsers();
+    } catch {
+      setActionMessage("Failed to delete user.");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Metrics Row */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <Metric
+          label="Total Registered Users"
+          value={number(metrics.totalUsers)}
+          note="Authors, contributors & registered members"
+          icon="Users"
+        />
+        <Metric
+          label="Active Article Authors"
+          value={number(metrics.totalAuthors)}
+          note="Users who have authored articles"
+          icon="Feather"
+        />
+        <Metric
+          label="Published Articles"
+          value={number(metrics.totalArticles)}
+          note="Live on the platform across all authors"
+          icon="FileText"
+        />
+      </div>
+
+      {actionMessage && (
+        <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground">
+          <span>{actionMessage}</span>
+          <button onClick={() => setActionMessage("")} className="font-semibold underline">
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Controls & Filters */}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="relative flex-1">
+          <Icon
+            name="Search"
+            size={17}
+            className="absolute left-3 top-3 text-muted-foreground"
+          />
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search by name or email address…"
+            className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+        <select
+          value={roleFilter}
+          onChange={(e) => {
+            setRoleFilter(e.target.value);
+            setPage(1);
+          }}
+          className="h-10 rounded-xl border border-border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="">All user types</option>
+          <option value="author">Article Authors</option>
+          <option value="student">Student Users</option>
+          <option value="admin">Admins</option>
+        </select>
+      </div>
+
+      {/* Users Table */}
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-5 py-3.5">User</th>
+                <th className="px-4 py-3.5">Type & Role</th>
+                <th className="px-4 py-3.5">College / Info</th>
+                <th className="px-4 py-3.5">Articles</th>
+                <th className="px-4 py-3.5">Total Views</th>
+                <th className="px-4 py-3.5">Joined</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      <span>Loading users…</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                    No users found matching your search.
+                  </td>
+                </tr>
+              ) : (
+                users.map((u) => {
+                  const initial = (u.name || "U")[0]?.toUpperCase();
+                  const isSuper = u.role === "super_admin";
+                  const isAdmin = u.role === "admin";
+                  const hasArticles = (u.articlesCount || 0) > 0;
+
+                  return (
+                    <tr
+                      key={u._id}
+                      className="group transition-colors hover:bg-muted/30"
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          {u.profilePic ? (
+                            <img
+                              src={u.profilePic}
+                              alt={u.name}
+                              className="h-10 w-10 shrink-0 rounded-full border border-border object-cover"
+                            />
+                          ) : (
+                            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/20 to-primary/40 font-bold text-primary">
+                              {initial}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="flex items-center gap-1.5 font-semibold text-foreground">
+                              <span className="truncate">{u.name}</span>
+                              {u.isVerified && (
+                                <span title="Verified User"><Icon name="CheckCircle2" size={15} className="text-primary shrink-0" /></span>
+                              )}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {u.email}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {isSuper ? (
+                            <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                              Super Admin
+                            </span>
+                          ) : isAdmin ? (
+                            <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                              Admin
+                            </span>
+                          ) : hasArticles ? (
+                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                              Author
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                              {u.type === "student" ? "Student" : "Member"}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-xs text-muted-foreground">
+                        {u.college ? (
+                          <div>
+                            <p className="font-medium text-foreground truncate max-w-[160px]">
+                              {u.college}
+                            </p>
+                            {u.year ? <p>Year {u.year}</p> : null}
+                          </div>
+                        ) : u.bio ? (
+                          <p className="line-clamp-2 max-w-[200px] italic">
+                            “{u.bio}”
+                          </p>
+                        ) : (
+                          <span className="text-muted-foreground/60">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="inline-flex items-center gap-1 font-semibold">
+                          <Icon name="FileText" size={14} className="text-muted-foreground" />
+                          {u.articlesCount || 0}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 font-semibold">
+                        {number(u.totalViews || 0)}
+                      </td>
+                      <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
+                        {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => void openUserDetails(u._id)}
+                            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold transition hover:bg-muted"
+                          >
+                            <Icon name="Eye" size={13} />
+                            <span>Details</span>
+                          </button>
+                          <button
+                            onClick={() => void removeUser(u)}
+                            className="rounded-lg p-1.5 text-destructive/70 transition hover:bg-destructive/10 hover:text-destructive"
+                            title="Delete User"
+                          >
+                            <Icon name="Trash2" size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t border-border px-5 py-4 text-sm">
+          <p className="text-xs text-muted-foreground">
+            Page <span className="font-semibold text-foreground">{page}</span> of{" "}
+            <span className="font-semibold text-foreground">{pages}</span>
+          </p>
+          <div className="flex gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="rounded-xl border border-border px-3 py-1 text-xs font-semibold disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <button
+              disabled={page >= pages}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-xl border border-border px-3 py-1 text-xs font-semibold disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* User Details Modal */}
+      {selectedUserId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) closeUserDetails();
+          }}
+        >
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-border bg-card shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card/95 px-6 py-4 backdrop-blur">
+              <div className="flex items-center gap-2">
+                <Icon name="User" size={20} className="text-primary" />
+                <h3 className="text-lg font-bold">User Details</h3>
+              </div>
+              <button
+                onClick={closeUserDetails}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <Icon name="X" size={19} />
+              </button>
+            </div>
+
+            {loadingDetails ? (
+              <div className="flex min-h-64 items-center justify-center p-8">
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  <span>Loading user profile & statistics…</span>
+                </div>
+              </div>
+            ) : detailsData ? (
+              <div className="space-y-6 p-6">
+                {/* Profile Overview Card */}
+                <div className="flex flex-col gap-5 rounded-2xl border border-border bg-muted/20 p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    {detailsData.user.profilePic ? (
+                      <img
+                        src={detailsData.user.profilePic}
+                        alt={detailsData.user.name}
+                        className="h-16 w-16 shrink-0 rounded-full border-2 border-primary/20 object-cover shadow"
+                      />
+                    ) : (
+                      <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/20 to-primary/40 text-2xl font-bold text-primary">
+                        {(detailsData.user.name || "U")[0]?.toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h4 className="text-xl font-bold text-foreground">
+                          {detailsData.user.name}
+                        </h4>
+                        {detailsData.user.isVerified && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                            <Icon name="CheckCircle2" size={13} />
+                            Verified
+                          </span>
+                        )}
+                        <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold capitalize text-muted-foreground">
+                          {detailsData.user.role || detailsData.user.type}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {detailsData.user.email}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Joined on{" "}
+                        {detailsData.user.createdAt
+                          ? new Date(detailsData.user.createdAt).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : "Unknown date"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => removeUser(detailsData.user)}
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
+                  >
+                    <Icon name="Trash2" size={14} />
+                    Delete User
+                  </button>
+                </div>
+
+                {/* Bio & Social Links */}
+                {(detailsData.user.bio ||
+                  detailsData.user.college ||
+                  detailsData.user.articleProfile?.socialLinks) && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {detailsData.user.bio && (
+                      <div className="rounded-2xl border border-border bg-card p-4">
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">
+                          Biography
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-foreground">
+                          {detailsData.user.bio}
+                        </p>
+                      </div>
+                    )}
+                    {detailsData.user.college && (
+                      <div className="rounded-2xl border border-border bg-card p-4">
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">
+                          Education / College
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-foreground">
+                          {detailsData.user.college}
+                        </p>
+                        {detailsData.user.year ? (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Academic Year: {detailsData.user.year}
+                          </p>
+                        ) : null}
+                      </div>
+                    )}
+                    {detailsData.user.articleProfile?.socialLinks && (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-card p-4">
+                        <p className="text-xs font-semibold uppercase text-muted-foreground mb-3">
+                          Social & External Links
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                          {detailsData.user.articleProfile.socialLinks.twitter && (
+                            <a
+                              href={`https://twitter.com/${detailsData.user.articleProfile.socialLinks.twitter.replace('@', '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-primary transition"
+                            >
+                              <Icon name="Twitter" size={14} />
+                              Twitter
+                            </a>
+                          )}
+                          {detailsData.user.articleProfile.socialLinks.linkedin && (
+                            <a
+                              href={detailsData.user.articleProfile.socialLinks.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-primary transition"
+                            >
+                              <Icon name="Linkedin" size={14} />
+                              LinkedIn
+                            </a>
+                          )}
+                          {detailsData.user.articleProfile.socialLinks.website && (
+                            <a
+                              href={detailsData.user.articleProfile.socialLinks.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-primary transition"
+                            >
+                              <Icon name="Globe" size={14} />
+                              Website
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Statistics Grid */}
+                <div>
+                  <h4 className="mb-3 text-sm font-semibold text-foreground">
+                    Author & Engagement Stats
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div className="rounded-xl border border-border bg-muted/20 p-3.5">
+                      <p className="text-xs text-muted-foreground">Articles</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {detailsData.stats.articlesCount}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {detailsData.stats.publishedCount} published
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-border bg-muted/20 p-3.5">
+                      <p className="text-xs text-muted-foreground">Total Views</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {number(detailsData.stats.totalViews)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-border bg-muted/20 p-3.5">
+                      <p className="text-xs text-muted-foreground">Engagement</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {number(detailsData.stats.totalEngagement)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {detailsData.stats.totalLikes} likes · {detailsData.stats.totalComments} comments
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-border bg-muted/20 p-3.5">
+                      <p className="text-xs text-muted-foreground">Community</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {detailsData.user.followersCount || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        followers · {detailsData.user.followingCount || 0} following
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Articles List */}
+                <div>
+                  <h4 className="mb-3 text-sm font-semibold text-foreground">
+                    Articles Authored ({detailsData.articles.length})
+                  </h4>
+                  {detailsData.articles.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                      This user hasn't written any articles yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                      {detailsData.articles.map((art) => (
+                        <div
+                          key={art._id}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 p-3 text-sm transition hover:bg-muted/40"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/articles/${art.slug}`}
+                                target="_blank"
+                                className="font-semibold text-foreground hover:text-primary transition truncate"
+                              >
+                                {art.title}
+                              </Link>
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0 ${
+                                  art.status === "published"
+                                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                    : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {art.status}
+                              </span>
+                            </div>
+                            <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                              <span>{art.category}</span>
+                              <span>·</span>
+                              <span>{number(art.views)} views</span>
+                              <span>·</span>
+                              <span>{art.likesCount} likes</span>
+                              <span>·</span>
+                              <span>{art.commentsCount} comments</span>
+                            </div>
+                          </div>
+                          <Link
+                            href={`/articles/${art.slug}`}
+                            target="_blank"
+                            className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted hover:text-foreground shrink-0"
+                            title="View article"
+                          >
+                            <Icon name="ExternalLink" size={14} />
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Modal Footer */}
+            <div className="border-t border-border bg-muted/20 px-6 py-4 flex justify-end">
+              <button
+                onClick={closeUserDetails}
+                className="rounded-xl border border-border bg-card px-5 py-2 text-sm font-semibold hover:bg-muted transition"
+              >
+                Close
               </button>
             </div>
           </div>

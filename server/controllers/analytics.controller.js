@@ -5,6 +5,8 @@ const AnalyticsSession = require("../models/AnalyticsSession");
 const AnalyticsDaily = require("../models/AnalyticsDaily");
 const logActivity = require("../utils/activityLogger");
 const geoip = require("geoip-lite");
+const User = require("../models/User");
+const ArticleUser = require("../models/ArticleUser");
 
 const DAY = 24 * 60 * 60 * 1000;
 const retentionDate = () => new Date(Date.now() + 90 * DAY);
@@ -219,6 +221,248 @@ exports.deleteArticle = async (req, res) => {
     await article.deleteOne();
     res.json({ message: "Article deleted" });
   } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+
+exports.users = async (req, res) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(10, Number(req.query.limit) || 20));
+    const search = clean(req.query.search, 80);
+    const roleFilter = clean(req.query.role, 30);
+
+    const query = {};
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\exports._test = { getSource, dayStart, wordCount, unsafeHtml };");
+      query.$or = [
+        { name: { $regex: escaped, $options: "i" } },
+        { email: { $regex: escaped, $options: "i" } },
+      ];
+    }
+
+    const [articleUsers, studentUsers] = await Promise.all([
+      ArticleUser.find(query).select("-password").lean().catch(() => []),
+      User.find(query).select("-password").lean().catch(() => []),
+    ]);
+
+    const unifiedMap = new Map();
+
+    articleUsers.forEach((u) => {
+      const key = (u.email || String(u._id)).toLowerCase();
+      unifiedMap.set(key, {
+        _id: u._id,
+        name: u.name || "Unnamed User",
+        email: u.email || "",
+        role: u.role || "articleUser",
+        type: "article_user",
+        bio: u.bio || u.articleProfile?.bio || "",
+        profilePic: u.profilePic || u.articleProfile?.avatar || "",
+        articleProfile: u.articleProfile || {},
+        followersCount: u.followers?.length || 0,
+        followingCount: u.following?.length || 0,
+        createdAt: u.createdAt,
+        college: "",
+        year: null,
+        isVerified: true,
+      });
+    });
+
+    studentUsers.forEach((u) => {
+      const key = (u.email || String(u._id)).toLowerCase();
+      if (unifiedMap.has(key)) {
+        const existing = unifiedMap.get(key);
+        existing.college = u.college || existing.college;
+        existing.year = u.year || existing.year;
+        existing.isVerified = u.isVerified !== undefined ? u.isVerified : existing.isVerified;
+        existing.type = "both";
+      } else {
+        unifiedMap.set(key, {
+          _id: u._id,
+          name: u.name || "Unnamed User",
+          email: u.email || "",
+          role: "student",
+          type: "student",
+          bio: u.articleProfile?.bio || "",
+          profilePic: u.profilePic || u.articleProfile?.avatar || "",
+          articleProfile: u.articleProfile || {},
+          followersCount: u.followers?.length || 0,
+          followingCount: u.following?.length || 0,
+          createdAt: u.createdAt,
+          college: u.college || "",
+          year: u.year || null,
+          isVerified: Boolean(u.isVerified),
+        });
+      }
+    });
+
+    let allUsers = Array.from(unifiedMap.values());
+
+    if (roleFilter) {
+      if (roleFilter === "author") {
+        allUsers = allUsers.filter((u) => u.type === "article_user" || u.type === "both");
+      } else if (roleFilter === "student") {
+        allUsers = allUsers.filter((u) => u.type === "student" || u.type === "both");
+      } else if (roleFilter === "admin") {
+        allUsers = allUsers.filter((u) => u.role === "admin" || u.role === "super_admin");
+      }
+    }
+
+    allUsers.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+    const userIds = allUsers.map((u) => u._id);
+    const articleStats = await Article.aggregate([
+      { $match: { author: { $in: userIds } } },
+      {
+        $group: {
+          _id: "$author",
+          articlesCount: { $sum: 1 },
+          publishedCount: {
+            $sum: { $cond: [{ $eq: ["$status", "published"] }, 1, 0] }
+          },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: { $size: { $ifNull: ["$likes", []] } } },
+          totalComments: { $sum: { $size: { $ifNull: ["$comments", []] } } }
+        }
+      }
+    ]).catch(() => []);
+
+    const statsMap = new Map();
+    articleStats.forEach((s) => {
+      statsMap.set(String(s._id), s);
+    });
+
+    allUsers = allUsers.map((u) => {
+      const s = statsMap.get(String(u._id)) || {
+        articlesCount: 0,
+        publishedCount: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        totalComments: 0
+      };
+      return {
+        ...u,
+        articlesCount: s.articlesCount,
+        publishedCount: s.publishedCount,
+        totalViews: s.totalViews,
+        totalEngagement: s.totalLikes + s.totalComments,
+      };
+    });
+
+    const total = allUsers.length;
+    const paginated = allUsers.slice((page - 1) * limit, page * limit);
+    const totalAuthors = allUsers.filter((u) => u.articlesCount > 0).length;
+    const totalPublishedArticles = allUsers.reduce((sum, u) => sum + (u.publishedCount || 0), 0);
+
+    res.json({
+      items: paginated,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit) || 1,
+      metrics: {
+        totalUsers: total,
+        totalAuthors,
+        totalArticles: totalPublishedArticles,
+      }
+    });
+  } catch (error) {
+    console.error("USERS FETCH ERROR:", error);
+    res.status(500).json({ message: error.message || "Failed to fetch users" });
+  }
+};
+
+exports.userDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let user = await ArticleUser.findById(id).select("-password").lean().catch(() => null);
+    let isArticleUser = Boolean(user);
+
+    if (!user) {
+      user = await User.findById(id).select("-password").lean().catch(() => null);
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const articles = await Article.find({ author: user._id })
+      .select("title slug status category views likes comments createdAt updatedAt coverImage")
+      .sort({ updatedAt: -1 })
+      .lean()
+      .catch(() => []);
+
+    const formattedArticles = articles.map((a) => ({
+      _id: a._id,
+      title: a.title,
+      slug: a.slug,
+      status: a.status,
+      category: a.category || "Uncategorized",
+      views: a.views || 0,
+      likesCount: a.likes?.length || 0,
+      commentsCount: a.comments?.length || 0,
+      createdAt: a.createdAt,
+      updatedAt: a.updatedAt,
+      coverImage: a.coverImage,
+    }));
+
+    const totalViews = formattedArticles.reduce((sum, a) => sum + (a.views || 0), 0);
+    const totalLikes = formattedArticles.reduce((sum, a) => sum + (a.likesCount || 0), 0);
+    const totalComments = formattedArticles.reduce((sum, a) => sum + (a.commentsCount || 0), 0);
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name || "Unnamed User",
+        email: user.email || "",
+        role: user.role || (isArticleUser ? "articleUser" : "student"),
+        bio: user.bio || user.articleProfile?.bio || "",
+        profilePic: user.profilePic || user.articleProfile?.avatar || "",
+        college: user.college || "",
+        year: user.year || null,
+        isVerified: Boolean(user.isVerified),
+        articleProfile: user.articleProfile || {},
+        followersCount: user.followers?.length || 0,
+        followingCount: user.following?.length || 0,
+        createdAt: user.createdAt,
+      },
+      stats: {
+        articlesCount: formattedArticles.length,
+        publishedCount: formattedArticles.filter((a) => a.status === "published").length,
+        totalViews,
+        totalLikes,
+        totalComments,
+        totalEngagement: totalLikes + totalComments,
+      },
+      articles: formattedArticles,
+    });
+  } catch (error) {
+    console.error("USER DETAILS ERROR:", error);
+    res.status(500).json({ message: error.message || "Failed to fetch user details" });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let deleted = await ArticleUser.findByIdAndDelete(id).catch(() => null);
+    if (!deleted) {
+      deleted = await User.findByIdAndDelete(id).catch(() => null);
+    }
+    if (!deleted) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    await logActivity({
+      adminId: req.admin._id,
+      action: "DELETE_USER",
+      details: `Deleted user ${deleted.name} (${deleted.email})`,
+      targetId: deleted._id,
+      targetModel: "User",
+      ipAddress: req.ip,
+    }).catch(() => {});
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports._test = { getSource, dayStart, wordCount, unsafeHtml };
