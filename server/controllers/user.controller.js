@@ -17,20 +17,20 @@ const getCookieOptions = () => ({
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, year, college } = req.body;
+        const { name, email, password, year, college, category } = req.body;
         
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: "User already exists" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        user = new User({ name, email, password: hashedPassword, year, college });
+        user = new User({ name, email, password: hashedPassword, year, college, category: category || "All" });
         await user.save();
 
         const token = jwt.sign({ id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: "7d" });
         
         res.cookie("userToken", token, getCookieOptions());
 
-        res.status(201).json({ user: { _id: user._id, id: user._id, name, email, year, college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
+        res.status(201).json({ user: { _id: user._id, id: user._id, name, email, category: user.category || "All", year, college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -49,7 +49,7 @@ const loginUser = async (req, res) => {
         
         res.cookie("userToken", token, getCookieOptions());
 
-        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, category: user.category || "All", year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -68,7 +68,7 @@ const getMe = async (req, res) => {
         const user = await User.findById(req.user.id).select("-password");
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following }, isAuthenticated: true });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, category: user.category || "All", year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following }, isAuthenticated: true });
     } catch (error) {
         res.json({ user: null, isAuthenticated: false });
     }
@@ -93,7 +93,7 @@ const googleLogin = async (req, res) => {
         
         res.cookie("userToken", jwtToken, getCookieOptions());
 
-        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, category: user.category || "All", year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: "Google login failed" });
     }
@@ -110,7 +110,7 @@ const updateProfile = async (req, res) => {
         if (college) user.college = college;
 
         await user.save();
-        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
+        res.json({ user: { _id: user._id, id: user._id, name: user.name, email: user.email, category: user.category || "All", year: user.year, college: user.college, profilePic: user.profilePic, articleProfile: user.articleProfile, followers: user.followers, following: user.following } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

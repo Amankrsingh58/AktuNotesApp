@@ -24,6 +24,7 @@ export interface User {
   articleProfile?: ArticleProfile;
   followers?: string[];
   following?: string[];
+  category?: string;
   createdAt?: string;
 }
 

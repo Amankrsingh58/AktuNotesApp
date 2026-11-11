@@ -14,7 +14,7 @@ const getCookieOptions = () => ({
 
 const registerArticleUser = async (req, res) => {
     try {
-        const { name, email, password, bio } = req.body;
+        const { name, email, password, bio, category } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email, and password are required" });
@@ -29,6 +29,7 @@ const registerArticleUser = async (req, res) => {
             email,
             password: hashedPassword,
             bio: bio || "",
+            category: category || "All",
             role: "articleUser"
         });
         await user.save();
@@ -42,6 +43,7 @@ const registerArticleUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                category: user.category || "All",
                 bio: user.bio,
                 role: user.role,
                 profilePic: user.profilePic,
@@ -73,6 +75,7 @@ const loginArticleUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                category: user.category || "All",
                 bio: user.bio,
                 role: user.role,
                 profilePic: user.profilePic,
@@ -105,6 +108,7 @@ const getArticleMe = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                category: user.category || "All",
                 bio: user.bio,
                 role: user.role,
                 profilePic: user.profilePic,

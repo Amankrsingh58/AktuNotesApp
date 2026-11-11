@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { ARTICLE_CATEGORIES } from "@/lib/categories";
 import Icon from "./Icons";
 import toast from "react-hot-toast";
 
@@ -20,13 +21,14 @@ export default function AuthModal() {
     email: "",
     password: "",
     bio: "",
+    category: "All",
   });
   const [loading, setLoading] = useState(false);
 
   if (!authModalOpen) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -125,19 +127,43 @@ export default function AuthModal() {
           </div>
 
           {authModalView === "signup" && (
-            <div>
-              <label className="text-xs font-semibold text-foreground ml-1">
-                Bio / Profession
-              </label>
-              <textarea
-                name="bio"
-                placeholder="Software Developer, Student, Writer..."
-                value={formData.bio}
-                onChange={handleChange}
-                rows={2}
-                className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm resize-none"
-              />
-            </div>
+            <>
+              <div>
+                <div className="flex items-center justify-between ml-1 mb-1">
+                  <label className="text-xs font-semibold text-foreground">
+                    Preferred Category
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Optional</span>
+                </div>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm"
+                >
+                  <option value="All">All Categories (Default)</option>
+                  {ARTICLE_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-foreground ml-1">
+                  Bio / Profession
+                </label>
+                <textarea
+                  name="bio"
+                  placeholder="Software Developer, Student, Writer..."
+                  value={formData.bio}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm resize-none"
+                />
+              </div>
+            </>
           )}
 
           <button

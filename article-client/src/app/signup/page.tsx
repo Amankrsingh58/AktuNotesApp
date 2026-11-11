@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { ARTICLE_CATEGORIES } from "@/lib/categories";
 import toast from "react-hot-toast";
 
 export default function SignupPage() {
@@ -22,11 +23,12 @@ export default function SignupPage() {
     email: "",
     password: "",
     bio: "",
+    category: "All",
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -96,6 +98,30 @@ export default function SignupPage() {
               onChange={handleChange}
               className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm"
             />
+          </div>
+          <div>
+            <div className="flex items-center justify-between ml-1 mb-1">
+              <label className="text-sm font-medium text-foreground">
+                Preferred Category
+              </label>
+              <span className="text-xs text-muted-foreground">Optional</span>
+            </div>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full mt-1 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary outline-none text-foreground text-sm"
+            >
+              <option value="All">All Categories (Default)</option>
+              {ARTICLE_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground mt-1 ml-1">
+              Select your primary interest or leave as All. You can update this anytime in your profile.
+            </p>
           </div>
           <div>
             <label className="text-sm font-medium text-foreground ml-1">

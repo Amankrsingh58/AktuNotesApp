@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Article } from "@/lib/types";
+import { ARTICLE_CATEGORIES } from "@/lib/categories";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getUserArticles,
@@ -40,6 +41,7 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
   const [profileForm, setProfileForm] = useState({
     name: "",
     bio: "",
+    category: "All",
     website: "",
     twitter: "",
     linkedin: "",
@@ -48,16 +50,15 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
 
   // Sync profile form when user updates
   useEffect(() => {
-    if (user?.articleProfile) {
+    if (user) {
       setProfileForm({
         name: user.name || "",
-        bio: user.articleProfile.bio || "",
-        website: user.articleProfile.socialLinks?.website || "",
-        twitter: user.articleProfile.socialLinks?.twitter || "",
-        linkedin: user.articleProfile.socialLinks?.linkedin || "",
+        bio: user.articleProfile?.bio || user.bio || "",
+        category: user.category || "All",
+        website: user.articleProfile?.socialLinks?.website || "",
+        twitter: user.articleProfile?.socialLinks?.twitter || "",
+        linkedin: user.articleProfile?.socialLinks?.linkedin || "",
       });
-    } else if (user) {
-      setProfileForm((previous) => ({ ...previous, name: user.name || "" }));
     }
   }, [user]);
 
@@ -244,6 +245,30 @@ export default function MainLayout({ initialArticles }: MainLayoutProps) {
                       <p className="text-xs text-muted-foreground mt-1.5">
                         This bio will be shown to other students next to your
                         published stories.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label htmlFor="preferred-category" className="block text-sm font-semibold text-foreground mb-2">
+                        Preferred reading category
+                      </label>
+                      <select
+                        id="preferred-category"
+                        value={profileForm.category}
+                        onChange={(e) =>
+                          setProfileForm({ ...profileForm, category: e.target.value })
+                        }
+                        className="w-full bg-background border border-input rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
+                      >
+                        <option value="All">All Categories (Default — No Filter)</option>
+                        {ARTICLE_CATEGORIES.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        Your &ldquo;For you&rdquo; feed will automatically prioritize this topic if at least 5 stories are available. Choose &ldquo;All Categories&rdquo; to browse everything without filtering.
                       </p>
                     </div>
 

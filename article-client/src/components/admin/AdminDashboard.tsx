@@ -27,6 +27,7 @@ type UserRow = {
   email: string;
   role: string;
   type: "article_user" | "student" | "both";
+  category?: string;
   bio?: string;
   profilePic?: string;
   articleProfile?: {
@@ -1642,6 +1643,9 @@ function UserManager() {
                         )}
                         <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold capitalize text-muted-foreground">
                           {detailsData.user.role || detailsData.user.type}
+                        </span>
+                        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                          Category: {detailsData.user.category || "All"}
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">

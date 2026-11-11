@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
     password: { type: String }, // Optional for Google users
     year: { type: Number },
     college: { type: String },
+    category: { type: String, default: "All", trim: true },
     profilePic: { type: String },
     googleId: { type: String },
     isVerified: { type: Boolean, default: false },

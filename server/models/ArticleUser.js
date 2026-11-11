@@ -5,6 +5,7 @@ const ArticleUserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     bio: { type: String, default: "" },
+    category: { type: String, default: "All", trim: true },
     profilePic: { type: String },
     role: { type: String, enum: ["admin", "super_admin", "articleUser"], default: "articleUser" },
     articleProfile: {
